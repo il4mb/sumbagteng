@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import * as React from "react";
 import { alpha, Theme, Components } from "@mui/material/styles";
 import { svgIconClasses } from "@mui/material/SvgIcon";
@@ -7,9 +7,8 @@ import { toggleButtonClasses } from "@mui/material/ToggleButton";
 import CheckBoxOutlineBlankRoundedIcon from "@mui/icons-material/CheckBoxOutlineBlankRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import { gray, brand, colorSchemes } from "../themePrimitives";
-import { red, yellow } from "@mui/material/colors";
-import { BorderColor } from "@mui/icons-material";
+import { gray, brand, red } from "../themePrimitives";
+import { blue } from "@mui/material/colors";
 
 export const inputsCustomizations: Components<Theme> = {
     MuiButtonBase: {
@@ -42,11 +41,8 @@ export const inputsCustomizations: Components<Theme> = {
                         },
                         style: {
                             height: "1.8rem",
-                            padding: "8px 18px",
+                            padding: "8px 12px",
                             fontSize: "0.75rem",
-                            "&:hover": {
-                                color: 'white',
-                            }
                         },
                     },
                     {
@@ -64,17 +60,18 @@ export const inputsCustomizations: Components<Theme> = {
                         },
                         style: {
                             color: "white",
-                            background: red[600],
-                            border: `1px solid ${red[400]}`,
+                            backgroundColor: blue[800],
+                            border: `1px solid`,
+                            borderColor: 'transparent',
                             "&:hover": {
                                 backgroundImage: "none",
-                                background: red[400],
+                                backgroundColor: blue[700],
                             },
                             "&:active": {
-                                background: red[600],
+                                backgroundColor: blue[800],
                             },
                             ...theme.applyStyles("dark", {
-                                background: red[600],
+                                backgroundColor: blue[600]
                             }),
                         },
                     },
@@ -85,52 +82,20 @@ export const inputsCustomizations: Components<Theme> = {
                         },
                         style: {
                             color: "white",
-                            background: gray[600],
-                            border: `1px solid ${gray[500]}`,
+                            backgroundColor: gray[600],
+                            border: `1px solid ${gray[900]}`,
                             "&:hover": {
                                 backgroundImage: "none",
-                                background: gray[700],
+                                backgroundColor: gray[700],
                             },
                             "&:active": {
-                                background: gray[800],
-                            },
-                        },
-                    },
-                    {
-                        props: {
-                            color: "warning",
-                            variant: "outlined",
-                        },
-                        style: {
-                            color: yellow[700],
-                            border: "1px solid",
-                            borderColor: yellow[400],
-                            backgroundColor: yellow[50],
-                            "&:hover": {
-                                backgroundColor: yellow[500],
-                                borderColor: yellow[400],
-                                color: "white",
-                            },
-                            "&:active": {
-                                backgroundColor: alpha(yellow[200], 0.7),
-                                color: "white",
+                                backgroundColor: gray[800]
                             },
                             ...theme.applyStyles("dark", {
-                                color: yellow[50],
-                                border: "1px solid",
-                                borderColor: yellow[900],
-                                backgroundColor: alpha(yellow[900], 0.3),
-                                "&:hover": {
-                                    borderColor: yellow[700],
-                                    backgroundColor: alpha(yellow[900], 0.6),
-                                    color: "white",
-                                },
-                                "&:active": {
-                                    backgroundColor: alpha(yellow[900], 0.5),
-                                    color: "white",
-                                },
+                                backgroundColor: gray[700],
+                                borderColor: gray[400],
                             }),
-                        }
+                        },
                     },
 
                     {
@@ -139,29 +104,29 @@ export const inputsCustomizations: Components<Theme> = {
                         },
                         style: {
                             color: theme.palette.text.primary,
-                            border: "1px solid red",
-                            borderColor: red[400],
+                            border: "1px solid blue",
+                            borderColor: blue[400],
                             borderWidth: 1,
                             borderStyle: "solid",
-                            backgroundColor: alpha(red[50], 0),
+                            backgroundColor: alpha(blue[50], 0),
                             "&:hover": {
-                                backgroundColor: red[700],
-                                borderColor: red[900],
+                                backgroundColor: blue[700],
+                                borderColor: blue[900],
                                 color: "white",
                             },
                             "&:active": {
-                                backgroundColor: red[700],
+                                backgroundColor: blue[700],
                             },
                             ...theme.applyStyles("dark", {
-                                // backgroundColor: red[800],
-                                borderColor: red[600],
+                                // backgroundColor: blue[800],
+                                borderColor: blue[600],
 
                                 "&:hover": {
-                                    backgroundColor: red[700],
-                                    borderColor: red[600],
+                                    backgroundColor: blue[700],
+                                    borderColor: blue[600],
                                 },
                                 "&:active": {
-                                    backgroundColor: red[700],
+                                    backgroundColor: blue[700],
                                 },
                             }),
                         },
@@ -285,23 +250,29 @@ export const inputsCustomizations: Components<Theme> = {
                 textTransform: "none",
                 fontWeight: theme.typography.fontWeightMedium,
                 letterSpacing: 0,
-                color: theme.palette.text.primary,
+                color: "#000",
                 border: "1px solid ",
-                borderColor: gray[200],
-                backgroundColor: alpha(gray[50], 0.3),
+                borderColor: 'transparent',
+                backgroundColor: alpha(gray[50], 0.2),
+                minWidth: 0,
+                padding: 0,
+                width: '2rem !important',
+                height: '2rem !important',
+                "& > *": {
+                    fontSize: '16px'
+                },
                 "&:hover": {
                     backgroundColor: gray[100],
-                    borderColor: gray[300],
+                    borderColor: 'transparent',
                 },
                 "&:active": {
                     backgroundColor: gray[200],
                 },
                 ...theme.applyStyles("dark", {
-                    backgroundColor: gray[800],
-                    borderColor: gray[700],
+                    backgroundColor: alpha(gray[800], 0.2),
+                    color: gray[100],
                     "&:hover": {
                         backgroundColor: gray[900],
-                        borderColor: gray[600],
                     },
                     "&:active": {
                         backgroundColor: gray[900],
@@ -370,9 +341,7 @@ export const inputsCustomizations: Components<Theme> = {
         defaultProps: {
             disableRipple: true,
             icon: (
-                <CheckBoxOutlineBlankRoundedIcon
-                    sx={{ color: "hsla(210, 0%, 0%, 0.0)" }}
-                />
+                <CheckBoxOutlineBlankRoundedIcon sx={{ color: "hsla(210, 0%, 0%, 0.0)" }} />
             ),
             checkedIcon: <CheckRoundedIcon sx={{ height: 14, width: 14 }} />,
             indeterminateIcon: <RemoveRoundedIcon sx={{ height: 14, width: 14 }} />,
@@ -426,10 +395,13 @@ export const inputsCustomizations: Components<Theme> = {
         styleOverrides: {
             root: ({ theme }) => ({
                 "& .MuiFormLabel-root": {
-                    transform: "translate(14px, 50%)"
+                    top: "50%",
+                    transform: "translate(14px, -50%)",
+                    transition: 'all 0.2s ease'
                 },
                 "&:has(.Mui-focused), &:has(.MuiFormLabel-filled)": {
                     "& .MuiFormLabel-root": {
+                        top: 0,
                         transform: "translate(14px, -50%) scale(0.758)",
                         ...theme.applyStyles("dark", {
                             color: "white"
@@ -445,11 +417,12 @@ export const inputsCustomizations: Components<Theme> = {
                 border: "none",
             },
             input: ({ theme }) => ({
+                color: "#000",
                 "&::placeholder": {
                     opacity: 0.7,
-                    color: gray[500],
                 },
                 ...theme.applyStyles("dark", {
+                    color: "#fff",
                     "&::placeholder": {
                         opacity: 0.6,
                         color: "white",
@@ -463,41 +436,62 @@ export const inputsCustomizations: Components<Theme> = {
             input: {
                 padding: 0,
             },
-            root: ({ theme }) => ({
-                padding: "8px 12px",
-                color: theme.palette.text.primary,
-                borderRadius: theme.shape.borderRadius,
-                transition: "border 120ms ease-in",
-                border: '1px solid',
-                borderColor: alpha(gray[300], 0.4),
-                "&:hover": {
-                    borderColor: gray[300]
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                    border: 'none'
-                },
-                variants: [
-                    {
-                        props: {
-                            size: "small",
-                        },
-                        style: {
-                            // height: "2.25rem",
-                        },
+            root: ({ theme, ownerState }) => {
+
+                const { multiline, size } = ownerState;
+
+                return {
+                    padding: "8px 12px",
+                    color: theme.palette.text.primary,
+                    borderRadius: theme.shape.borderRadius,
+                    transition: "border 120ms ease-in",
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: blue[800],
                     },
-                    {
-                        props: {
-                            size: "medium",
-                        },
-                        style: {
-                            // height: "2.5rem",
-                        },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: blue[800],
                     },
-                ],
-            }),
-            notchedOutline: {
-                border: 'none'
+                    ...(multiline && {
+                        textAlign: 'left',
+                        verticalAlign: 'top'
+                    }),
+                    ...theme.applyStyles("dark", {
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: blue[400],
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: blue[400],
+                            color: "white"
+                        },
+                    }),
+                    variants: [
+                        {
+                            props: {
+                                size: "small",
+                            },
+                            style: {
+                                height: multiline ? "unset" : "2rem",
+                            },
+                        },
+                        {
+                            props: {
+                                size: "medium",
+                            },
+                            style: {
+                                height: multiline ? "unset" : "2.5rem",
+                            },
+                        },
+                    ],
+                }
             },
+            notchedOutline: ({ theme }) => ({
+                border: `1px solid`,
+                transition: "border 120ms ease-in",
+                borderColor: gray[500],
+                ...theme.applyStyles("dark", {
+                    borderColor: gray[400],
+                }),
+            }),
         },
     },
 
@@ -535,7 +529,7 @@ export const inputsCustomizations: Components<Theme> = {
                 "&:hover": {
                     borderColor: gray[800],
                     "& .MuiOutlinedInput-notchedOutline": {
-                        border: 'none',
+                        borderColor: gray[800],
                     }
                 },
                 variants: [

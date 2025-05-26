@@ -1,4 +1,3 @@
-'use client'
 import * as React from 'react';
 import { Theme, alpha, Components } from '@mui/material/styles';
 import { SvgIconProps } from '@mui/material/SvgIcon';
@@ -15,7 +14,6 @@ export const navigationCustomizations: Components<Theme> = {
   MuiMenuItem: {
     styleOverrides: {
       root: ({ theme }) => ({
-        // @ts-ignore
         borderRadius: (theme.vars || theme).shape.borderRadius,
         padding: '6px 8px',
         [`&.${menuItemClasses.focusVisible}`]: {
@@ -39,9 +37,7 @@ export const navigationCustomizations: Components<Theme> = {
       },
       paper: ({ theme }) => ({
         marginTop: '4px',
-        // @ts-ignore
         borderRadius: (theme.vars || theme).shape.borderRadius,
-        // @ts-ignore
         border: `1px solid ${(theme.vars || theme).palette.divider}`,
         backgroundImage: 'none',
         background: 'hsl(0, 0%, 100%)',
@@ -68,16 +64,13 @@ export const navigationCustomizations: Components<Theme> = {
     },
     styleOverrides: {
       root: ({ theme }) => ({
-        // @ts-ignore
         borderRadius: (theme.vars || theme).shape.borderRadius,
         border: '1px solid',
         borderColor: gray[200],
-        // @ts-ignore
         backgroundColor: (theme.vars || theme).palette.background.paper,
         boxShadow: `inset 0 1px 0 1px hsla(220, 0%, 100%, 0.6), inset 0 -1px 0 1px hsla(220, 35%, 90%, 0.5)`,
         '&:hover': {
           borderColor: gray[300],
-          // @ts-ignore
           backgroundColor: (theme.vars || theme).palette.background.paper,
           boxShadow: 'none',
         },
@@ -90,15 +83,12 @@ export const navigationCustomizations: Components<Theme> = {
         },
 
         ...theme.applyStyles('dark', {
-          // @ts-ignore
           borderRadius: (theme.vars || theme).shape.borderRadius,
           borderColor: gray[700],
-          // @ts-ignore
           backgroundColor: (theme.vars || theme).palette.background.paper,
           boxShadow: `inset 0 1px 0 1px ${alpha(gray[700], 0.15)}, inset 0 -1px 0 1px hsla(220, 0%, 0%, 0.7)`,
           '&:hover': {
             borderColor: alpha(gray[700], 0.7),
-            // @ts-ignore
             backgroundColor: (theme.vars || theme).palette.background.paper,
             boxShadow: 'none',
           },
@@ -130,27 +120,24 @@ export const navigationCustomizations: Components<Theme> = {
     },
     styleOverrides: {
       root: ({ theme }) => ({
-        // @ts-ignore
         color: (theme.vars || theme).palette.text.primary,
         fontWeight: 500,
         position: 'relative',
         textDecoration: 'none',
         width: 'fit-content',
-        '&:hover': {
-          // @ts-ignore
-          color: (theme.vars || theme).palette.primary.main,
-          backgroundColor: 'transparent',
-          textDecoration: 'none',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          width: '100%',
+          height: '1px',
+          bottom: 0,
+          left: 0,
+          backgroundColor: (theme.vars || theme).palette.text.secondary,
+          opacity: 0.3,
+          transition: 'width 0.3s ease, opacity 0.3s ease',
         },
-        [`&.${buttonBaseClasses.focusVisible}`]: {
-          backgroundColor: 'transparent',
-          outlineOffset: 0,
-          // @ts-ignore
-          borderRadius: (theme.vars || theme).shape.borderRadius,
-          outline: `3px solid ${alpha(brand[500], 0.5)}`,
-        },
-        [`&.${buttonBaseClasses.disabled}`]: {
-          pointerEvents: 'none',
+        '&:hover::before': {
+          width: 0,
         },
         '&:focus-visible': {
           outline: `3px solid ${alpha(brand[500], 0.5)}`,
@@ -163,7 +150,6 @@ export const navigationCustomizations: Components<Theme> = {
   MuiDrawer: {
     styleOverrides: {
       paper: ({ theme }) => ({
-        // @ts-ignore
         backgroundColor: (theme.vars || theme).palette.background.default,
       }),
     },
@@ -173,13 +159,11 @@ export const navigationCustomizations: Components<Theme> = {
       root: ({ theme }) => ({
         '&.Mui-selected': {
           color: 'white',
-          // @ts-ignore
           backgroundColor: (theme.vars || theme).palette.grey[900],
         },
         ...theme.applyStyles('dark', {
           '&.Mui-selected': {
             color: 'black',
-            // @ts-ignore
             backgroundColor: (theme.vars || theme).palette.grey[50],
           },
         }),
@@ -190,10 +174,8 @@ export const navigationCustomizations: Components<Theme> = {
     styleOverrides: {
       root: { minHeight: 'fit-content' },
       indicator: ({ theme }) => ({
-        // @ts-ignore
         backgroundColor: (theme.vars || theme).palette.grey[800],
         ...theme.applyStyles('dark', {
-          // @ts-ignore
           backgroundColor: (theme.vars || theme).palette.grey[200],
         }),
       }),
@@ -207,14 +189,11 @@ export const navigationCustomizations: Components<Theme> = {
         textTransform: 'none',
         minWidth: 'fit-content',
         minHeight: 'fit-content',
-        // @ts-ignore
         color: (theme.vars || theme).palette.text.secondary,
-        // @ts-ignore
         borderRadius: (theme.vars || theme).shape.borderRadius,
         border: '1px solid',
         borderColor: 'transparent',
         ':hover': {
-          // @ts-ignore
           color: (theme.vars || theme).palette.text.primary,
           backgroundColor: gray[100],
           borderColor: gray[200],
@@ -224,7 +203,6 @@ export const navigationCustomizations: Components<Theme> = {
         },
         ...theme.applyStyles('dark', {
           ':hover': {
-            // @ts-ignore
             color: (theme.vars || theme).palette.text.primary,
             backgroundColor: gray[800],
             borderColor: gray[700],
@@ -240,7 +218,6 @@ export const navigationCustomizations: Components<Theme> = {
     styleOverrides: {
       line: ({ theme }) => ({
         borderTop: '1px solid',
-        // @ts-ignore
         borderColor: (theme.vars || theme).palette.divider,
         flex: 1,
         borderRadius: '99px',
@@ -260,24 +237,20 @@ export const navigationCustomizations: Components<Theme> = {
         },
         '&.Mui-active': {
           border: 'none',
-          // @ts-ignore
           color: (theme.vars || theme).palette.primary.main,
         },
         '&.Mui-completed': {
           border: 'none',
-          // @ts-ignore
           color: (theme.vars || theme).palette.success.main,
         },
         ...theme.applyStyles('dark', {
           border: `1px solid ${gray[700]}`,
           '&.Mui-active': {
             border: 'none',
-            // @ts-ignore
             color: (theme.vars || theme).palette.primary.light,
           },
           '&.Mui-completed': {
             border: 'none',
-            // @ts-ignore
             color: (theme.vars || theme).palette.success.light,
           },
         }),

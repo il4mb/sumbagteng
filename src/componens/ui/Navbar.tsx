@@ -47,7 +47,7 @@ export default function Navbar({ }: Props) {
 							{label}
 						</Box>
 					))}
-					<Button LinkComponent={Link} href={'/dashboard'} variant="contained" color="primary">Login</Button>
+					<Button LinkComponent={Link} href={'/login'} variant="contained" color="primary">Login</Button>
 				</Box>
 			</Toolbar>
 		</Box>
@@ -57,7 +57,6 @@ export default function Navbar({ }: Props) {
 const navLinks = [
 	{ href: '/', label: 'Beranda' },
 	{ href: '/fitur', label: 'Fitur' },
-	{ href: '/harga', label: 'Harga' },
 	{ href: '/hubungi-kami', label: 'Hubungi Kami' },
 ];
 
