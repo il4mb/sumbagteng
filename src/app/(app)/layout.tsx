@@ -1,3 +1,4 @@
+'use client'
 import Navbar from "@/componens/ui/Navbar";
 import { Box } from "@mui/material";
 import { AnimatePresence } from "framer-motion";
