@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { app } from '@/firebase/config';
 import { useRouter } from 'next/navigation';
@@ -12,11 +12,11 @@ import {
     Link,
     Checkbox,
     FormControlLabel,
-    Divider,
     CircularProgress,
     Alert
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { useSnackbar } from 'notistack';
 
 const AuthContainer = styled(motion.div)(({ theme }) => ({
     display: 'flex',
@@ -36,6 +36,7 @@ const FormContainer = styled('form')({
 });
 
 export default function LoginPage() {
+    const { enqueueSnackbar } = useSnackbar();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -44,20 +45,64 @@ export default function LoginPage() {
     const router = useRouter();
     const auth = getAuth(app);
 
+    // Check remember me status on mount
+    useEffect(() => {
+        const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        if (storedToken) {
+            setRememberMe(localStorage.getItem('authToken') ? true : false);
+        }
+    }, []);
+
+    // Redirect to dashboard if already logged in
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (user) {
+                router.push('/dashboard');
+            }
+        });
+        return () => unsubscribe();
+    }, [auth, router]);
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            router.push('/dashboard');
+            const response = await signInWithEmailAndPassword(auth, email, password);
+            const user = response.user;
+
+            if (user) {
+                const token = await user.getIdToken();
+
+                const res = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token })
+                });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data?.message || 'Login failed at server.');
+                }
+                enqueueSnackbar('Login successful!', { variant: 'success' });
+                // Store token in localStorage if rememberMe is checked
+                if (rememberMe) {
+                    localStorage.setItem('authToken', token);
+                } else {
+                    sessionStorage.setItem('authToken', token);
+                }
+                router.push('/dashboard');
+            }
         } catch (err: any) {
-            setError(getFirebaseError(err.code));
+            setError(getFirebaseError(err.code || err.message));
         } finally {
             setLoading(false);
         }
     };
+
 
     const getFirebaseError = (code: string) => {
         switch (code) {

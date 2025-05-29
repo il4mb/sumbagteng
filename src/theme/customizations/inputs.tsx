@@ -256,10 +256,11 @@ export const inputsCustomizations: Components<Theme> = {
                 backgroundColor: alpha(gray[50], 0.2),
                 minWidth: 0,
                 padding: 0,
-                width: '2rem !important',
-                height: '2rem !important',
+                width: '2.6rem',
+                height: '2.6rem',
                 "& > *": {
-                    fontSize: '16px'
+                    fontSize: '22px',
+                    fontWeight: 800,
                 },
                 "&:hover": {
                     backgroundColor: gray[100],
@@ -395,7 +396,7 @@ export const inputsCustomizations: Components<Theme> = {
         styleOverrides: {
             root: ({ theme }) => ({
                 "& .MuiFormLabel-root": {
-                    top: "50%",
+                    top: "1.5em",
                     transform: "translate(14px, -50%)",
                     transition: 'all 0.2s ease'
                 },
