@@ -20,7 +20,7 @@ export default function App() {
                         </Stack>
                         <ProfileAction />
                     </Stack>
-                } />
+                } online />
 
             <Grid container spacing={2} sx={{ mt: 8 }}>
                 <Grid size={{ xs: 12, md: 6 }} sx={{ textAlign: 'center' }}>

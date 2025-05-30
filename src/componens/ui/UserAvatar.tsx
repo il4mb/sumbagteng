@@ -2,7 +2,7 @@
 import { db } from '@/firebase/config';
 import { User } from '@/types';
 import { QuestionMarkRounded } from '@mui/icons-material';
-import { Avatar, Box } from '@mui/material';
+import { Avatar, Box, Tooltip } from '@mui/material';
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
@@ -38,18 +38,19 @@ export default function UserAvatar(props: IUserAvatarProps) {
     return (
         <Box sx={{ textAlign: 'center', display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
             {user ? (
-
-                <Avatar
-                    src={user.photo || undefined}
-                    alt={user.name || "User Avatar"}
-                    sx={{
-                        width: size === "small" ? 30 : size === "medium" ? 38 : 48,
-                        height: size === "small" ? 30 : size === "medium" ? 38 : 48,
-                        fontSize: size === "small" ? 14 : size === "medium" ? 16 : 20,
-                        bgcolor: user.photo ? undefined : "primary.main"
-                    }}>
-                    {!user.photo && user.name?.[0]?.toUpperCase()}
-                </Avatar>
+                <Tooltip title={user.name} arrow>
+                    <Avatar
+                        src={user.photo || undefined}
+                        alt={user.name || "User Avatar"}
+                        sx={{
+                            width: size === "small" ? 30 : size === "medium" ? 38 : 48,
+                            height: size === "small" ? 30 : size === "medium" ? 38 : 48,
+                            fontSize: size === "small" ? 14 : size === "medium" ? 16 : 20,
+                            bgcolor: user.photo ? undefined : "primary.main"
+                        }}>
+                        {!user.photo && user.name?.[0]?.toUpperCase()}
+                    </Avatar>
+                </Tooltip>
 
             ) : (
                 <Box sx={{

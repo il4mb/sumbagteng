@@ -1,13 +1,33 @@
 'use client'
+import { User } from '@/types';
 import { Avatar, Box, Menu, MenuItem } from '@mui/material';
 import Link from 'next/link';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
+import { useAuth } from '../AuthProvider';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebase/config';
 
 
 export default function ProfileAction() {
-    
+    const auth = useAuth();
+    const [user, setUser] = useState<User | null>(null);
     const [anchor, setAnchor] = useState<HTMLDivElement | null>(null);
     const open = Boolean(anchor);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const uid = auth.user?.uid;
+            if (!uid) return;
+            const docRef = doc(db, "users", uid);
+            const snap = (await getDoc(docRef));
+            if (!snap.exists()) return;
+            setUser({
+                id: snap.id,
+                ...snap.data()
+            } as User)
+        }
+        fetchData();
+    }, [auth.user?.uid]);
 
     const handleOpen = (e: MouseEvent<HTMLDivElement>) => {
         setAnchor(e.currentTarget);
@@ -21,8 +41,8 @@ export default function ProfileAction() {
         <>
             <Box component={"div"} sx={{ position: 'relative' }} onClick={handleOpen}>
                 <Avatar
-                    src={""}
-                    alt={"Ilham B"}
+                    src={user?.photo}
+                    alt={user?.name}
                     sx={{ width: 40, height: 40 }}
 
                 />

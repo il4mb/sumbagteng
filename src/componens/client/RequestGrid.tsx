@@ -7,8 +7,9 @@ import { useEffect, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Timestamp } from "firebase/firestore";
 import { useAuth } from "../AuthProvider";
-import RequestViewDialogButton from "./RequestViewDialogButton";
+import DesignViewDialog from "./designs/DesignViewDialog";
 import ChatButton from "../chats/ChatButton";
+import ProductionViewDialog from "./productions/ProductionViewDialog";
 
 export interface MappedRequest extends Omit<RequestBase, "createdAt" | "updatedAt"> {
     type: "design" | "production";
@@ -20,7 +21,12 @@ export interface MappedRequest extends Omit<RequestBase, "createdAt" | "updatedA
 const columns: GridColDef<MappedRequest>[] = [
     { field: "id", headerName: "ID", width: 90 },
     { field: "type", headerName: "Type", width: 130 },
-    { field: "status", headerName: "Status", width: 130 },
+    {
+        field: "status",
+        headerName: "Status",
+        width: 130,
+        valueFormatter: (value: string) => value.toUpperCase()
+    },
     { field: "description", headerName: "Description", width: 300 },
     { field: "createdAt", headerName: "Created At", width: 200 },
     { field: "updatedAt", headerName: "Updated At", width: 200 },
@@ -34,9 +40,14 @@ const columns: GridColDef<MappedRequest>[] = [
             const row = params.row;
             return (
                 <Stack direction="row" spacing={1} alignItems={'center'} mt={0.5}>
-                    <RequestViewDialogButton row={row} />
-                    {row.type == "design" && ["CONFIRMED"].includes(row.status) && (
-                        <ChatButton row={row} />
+
+                    {row.type == "design" ? (
+                        <>
+                            <DesignViewDialog row={row} />
+                            <ChatButton designId={row.id} />
+                        </>
+                    ) : (
+                        <ProductionViewDialog row={row} />
                     )}
                 </Stack>
             );
@@ -66,11 +77,13 @@ export default function RequestGrid() {
                     return {
                         id: doc.id,
                         userId: data.userId,
-                        status: (data.status || "UNKNOWN").toUpperCase(),
+                        status: (data.status || "unknown"),
                         description: data.description || "",
                         createdAt: data.createdAt ? formatDate(data.createdAt) : undefined,
                         updatedAt: data.updatedAt ? formatDate(data.updatedAt) : undefined,
-                        timestamp: data.createdAt?.toMillis(), // Convert to milliseconds for client-side sorting
+                        timestamp: data.createdAt?.toMillis(),
+                        executedBy: data.executedBy,
+                        createdBy: data.createdBy,
                         type: "design" as const,
                     };
                 });
@@ -95,11 +108,13 @@ export default function RequestGrid() {
                     return {
                         id: doc.id,
                         userId: data.userId,
-                        status: (data.status || "UNKNOWN").toUpperCase(),
+                        status: (data.status || "unknown"),
                         description: data.description || "",
                         createdAt: data.createdAt ? formatDate(data.createdAt) : undefined,
                         updatedAt: data.updatedAt ? formatDate(data.updatedAt) : undefined,
-                        timestamp: data.createdAt?.toMillis(), // Convert to milliseconds for client-side sorting
+                        timestamp: data.createdAt?.toMillis(),
+                        executedBy: data.executedBy,
+                        createdBy: data.createdBy,
                         type: "production" as const,
                     };
                 });
@@ -132,11 +147,8 @@ export default function RequestGrid() {
         <Box sx={{
             height: 600,
             width: "100%",
-            '& .status-approved': { backgroundColor: '#00ff4833' },
-            '& .status-rejected': { backgroundColor: '#ff000033' },
-            '& .status-in-progress': { backgroundColor: '#0066ff33' },
-            '& .status-completed': { backgroundColor: '#00ff0033' },
-            '& .status-revision': { backgroundColor: '#ff990033' },
+            '& .status-accepted': { backgroundColor: '#00ff4833' },
+            '& .status-finished': { backgroundColor: '#00ff0033' },
             '& .status-pending': { backgroundColor: '#f0f0f033' }
         }}>
             <DataGrid

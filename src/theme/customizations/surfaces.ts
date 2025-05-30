@@ -13,8 +13,7 @@ export const surfacesCustomizations: Components<Theme> = {
                 padding: 4,
                 overflow: 'clip',
                 backgroundColor: gray[50],
-                border: `1px solid ${gray[300]}`,
-                borderRadius: 0,
+                borderRadius: 3,
                 '&:not(:last-of-type)': {
                     borderBottom: 'none',
                 },

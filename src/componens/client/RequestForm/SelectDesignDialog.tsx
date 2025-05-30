@@ -1,6 +1,6 @@
 import { useAuth } from '@/componens/AuthProvider';
 import { db } from '@/firebase/config';
-import { DesignRequest } from '@/types';
+import { Completion, DesignRequest } from '@/types';
 import { TouchAppRounded } from '@mui/icons-material';
 import {
     Button,
@@ -15,20 +15,21 @@ import {
     CardMedia,
     CardContent,
     Typography,
-    CardActions,
     Box
 } from '@mui/material';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
 export interface ISelectDesignDialogProps {
     onSelect: (designId: string) => void;
 }
 
+type CompletedDesign = DesignRequest & { completion: Completion }
+
 export default function SelectDesignDialog({ onSelect }: ISelectDesignDialogProps) {
     const { user } = useAuth();
     const [open, setOpen] = useState(false);
-    const [designs, setDesigns] = useState<DesignRequest[]>([]);
+    const [designs, setDesigns] = useState<CompletedDesign[]>([]);
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -41,9 +42,33 @@ export default function SelectDesignDialog({ onSelect }: ISelectDesignDialogProp
     useEffect(() => {
         if (!user?.uid) return;
         const c = collection(db, 'designs');
-        const w = query(c, where('status', '==', 'completed'), where('createdBy', '==', user.uid));
-        const unsubscribe = onSnapshot(w, (snapshot) => {
-            const designData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as DesignRequest));
+        const w = query(c,
+            where('status', '==', 'finished'),
+            where('createdBy', '==', user.uid),
+            orderBy("createdAt", "desc")
+        );
+        const unsubscribe = onSnapshot(w, async (snapshot) => {
+            const designData = await Promise.all(snapshot.docs.map(async doc => {
+                const data = doc.data();
+
+                const completionRef = collection(c, doc.id, "completions");
+                const queryCompletion = query(completionRef, where("status", "==", "accepted"), limit(1));
+                const completion = (await getDocs(queryCompletion)).docs[0].data();
+
+                return {
+                    id: doc.id,
+                    ...data,
+                    createdAt: data.createdAt.toDate(),
+                    updatedAt: data.updatedAt ? data.updatedAt.toDate() : undefined,
+                    completion: {
+                        ...completion,
+                        completedAt: completion.completedAt.toDate(),
+                        updatedAt: completion.updatedAt ? completion.updatedAt.toDate() : undefined,
+
+                    }
+                } as CompletedDesign
+            }));
+
             setDesigns(designData);
         });
         return () => unsubscribe();
@@ -93,11 +118,11 @@ export default function SelectDesignDialog({ onSelect }: ISelectDesignDialogProp
                                                 transform: 'scale(1.02)'
                                             }
                                         }}>
-                                            {design.image && (
+                                            {design.completion && (
                                                 <CardMedia
                                                     component="img"
                                                     height="160"
-                                                    image={design.image}
+                                                    image={`/storage/${design.completion.image}`}
                                                     alt={design.name || 'Design thumbnail'}
                                                     sx={{ objectFit: 'cover', mx: 0, height: 200 }}
                                                 />
@@ -107,7 +132,7 @@ export default function SelectDesignDialog({ onSelect }: ISelectDesignDialogProp
                                                     {design.name || 'Untitled Design'}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    Created: {new Date(design.createdAt?.seconds * 1000).toLocaleDateString()}
+                                                    Created: {design.completion.completedAt.toLocaleDateString()}
                                                 </Typography>
                                             </CardContent>
                                         </Card>

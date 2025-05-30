@@ -34,7 +34,7 @@ export type DesignFormData = {
     name: string;
     size: string;
     theme: string;
-    reference: ImageSource[];
+    images: ImageSource[];
     description: string;
 }
 export interface IProductionFormProps {
@@ -50,7 +50,7 @@ type ImageSource = {
 
 export default function DesignForm({ data, onUpdate }: IProductionFormProps) {
     const { enqueueSnackbar } = useSnackbar();
-    const { name, size, theme, reference, description } = data;
+    const { name, size, theme, images, description } = data;
 
     const [newImageUrl, setNewImageUrl] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,7 +80,7 @@ export default function DesignForm({ data, onUpdate }: IProductionFormProps) {
 
         onUpdate(prev => ({
             ...prev,
-            reference: [...prev.reference, { type: 'url', value: trimmedUrl }]
+            images: [...prev.images, { type: 'url', value: trimmedUrl }]
         }));
 
         setNewImageUrl('');
@@ -92,14 +92,14 @@ export default function DesignForm({ data, onUpdate }: IProductionFormProps) {
             const objectUrl = URL.createObjectURL(file);
             onUpdate(prev => ({
                 ...prev,
-                reference: [...prev.reference, { type: 'upload', value: objectUrl, file }]
+                images: [...prev.images, { type: 'upload', value: objectUrl, file }]
             }));
         }
     };
 
     const handleRemoveImage = (index: number) => {
         onUpdate(prev => {
-            const newImages = [...prev.reference];
+            const newImages = [...prev.images];
             if (newImages[index].type === 'upload') {
                 URL.revokeObjectURL(newImages[index].value);
             }
@@ -120,9 +120,9 @@ export default function DesignForm({ data, onUpdate }: IProductionFormProps) {
             <Stack spacing={3} sx={{ maxWidth: 600, mx: 'auto' }}>
 
                 {/* Images Display */}
-                {reference.length > 0 && (
+                {images.length > 0 && (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {reference.map((image, index) => (
+                        {images.map((image, index) => (
                             <Chip
                                 key={index}
                                 label={image.type === 'url' ?

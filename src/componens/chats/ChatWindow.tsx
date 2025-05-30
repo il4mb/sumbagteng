@@ -2,22 +2,28 @@
 import { Box, Stack, Typography, IconButton, styled, Tooltip, SxProps } from '@mui/material';
 import { Chat, Message, User } from './ChatProvider';
 import { Close, Minimize } from '@mui/icons-material';
-import { motion, DragControls, Reorder, useDragControls, AnimatePresence } from 'framer-motion';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { DragControls, Reorder, useDragControls, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import ChatContent from './ChatContent';
 import { collection, doc, getDoc, onSnapshot, orderBy, query, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import ChatInput from './ChatInput';
 
+export type ChatWindowOptions = {
+    expand: boolean;
+};
 export interface IChatWindowProps {
     chat: Chat;
+    options: ChatWindowOptions;
     onClose: () => void;
+    onMinimize: () => void;
+    onMaximize: () => void;
 }
 
 export default function ChatWindow(props: IChatWindowProps) {
     const dragControls = useDragControls();
-    const { chat, onClose } = props;
-    const [expand, setExpand] = useState(true);
+    const { chat, options, onMinimize, onMaximize, onClose } = props;
+    const { expand } = options;
     const [messages, setMessages] = useState<Message[]>([]);
 
     useEffect(() => {
@@ -63,16 +69,15 @@ export default function ChatWindow(props: IChatWindowProps) {
             style={{ listStyle: 'none' }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-        >
+            transition={{ duration: 0.2 }}>
             <Box sx={WindowSx({ expand })}>
                 <ChatWindowHeader
                     chat={chat}
                     expand={expand}
-                    setExpand={setExpand}
+                    onMinimize={onMinimize}
+                    onMaximize={onMaximize}
                     onClose={onClose}
-                    dragControls={dragControls}
-                />
+                    dragControls={dragControls}/>
 
                 <AnimatePresence>
                     {expand && (
@@ -87,7 +92,6 @@ export default function ChatWindow(props: IChatWindowProps) {
     );
 }
 
-
 const WindowSx = ({ expand }: { expand: boolean }): SxProps => ({
     width: '100%',
     minWidth: expand ? 400 : 200,
@@ -101,7 +105,8 @@ const WindowSx = ({ expand }: { expand: boolean }): SxProps => ({
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden'
-})
+});
+
 const ActionButton = styled(IconButton)({
     minWidth: 0,
     minHeight: 0,
@@ -113,11 +118,15 @@ const ActionButton = styled(IconButton)({
 type ChatWindowHeaderProps = {
     chat: Chat;
     expand: boolean;
-    setExpand: Dispatch<SetStateAction<boolean>>;
+    onMinimize: () => void;
+    onMaximize: () => void;
     onClose: () => void;
     dragControls: DragControls
 }
-const ChatWindowHeader = ({ chat, expand, setExpand, onClose, dragControls }: ChatWindowHeaderProps) => {
+
+const ChatWindowHeader = (props: ChatWindowHeaderProps) => {
+    const { chat, expand, dragControls, onMinimize, onMaximize, onClose } = props;
+
     return (
         <Stack
             direction="row"
@@ -125,18 +134,13 @@ const ChatWindowHeader = ({ chat, expand, setExpand, onClose, dragControls }: Ch
             alignItems="center"
             onClick={() => {
                 if (expand) return
-                setExpand(true);
+                onMaximize();
             }}
             onPointerDown={(e) => {
                 e.preventDefault();
                 dragControls.start(e);
             }}
-            sx={{
-                px: 2,
-                py: 1,
-                cursor: expand ? 'grab' : "pointer",
-                userSelect: 'none'
-            }}>
+            sx={{ px: 2, py: 1, cursor: expand ? 'grab' : "pointer", userSelect: 'none' }}>
             <Typography
                 fontSize={16}
                 fontWeight={600}>
@@ -146,7 +150,7 @@ const ChatWindowHeader = ({ chat, expand, setExpand, onClose, dragControls }: Ch
             {expand && (
                 <Stack direction="row" spacing={1}>
                     <Tooltip title={"Minimize Window"} arrow>
-                        <ActionButton size="small" sx={{ color: 'white' }} onClick={() => setExpand(false)}>
+                        <ActionButton size="small" sx={{ color: 'white' }} onClick={() => onMinimize()}>
                             <Minimize fontSize="small" />
                         </ActionButton>
                     </Tooltip>

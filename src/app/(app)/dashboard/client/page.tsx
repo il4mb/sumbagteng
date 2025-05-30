@@ -23,7 +23,7 @@ export default function App(props: IAppProps) {
                         </Stack>
                         <ProfileAction />
                     </Stack>
-                } />
+                } online />
 
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                 <CreateRequestDialogButton />

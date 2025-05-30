@@ -161,7 +161,6 @@ export default function ProductionForm({ data, onUpdate }: IProductionFormProps)
                                 helperText={errors.quantity}
                                 fullWidth
                                 required
-                                inputProps={{ min: 1 }}
                             />
                         </Grid>
 

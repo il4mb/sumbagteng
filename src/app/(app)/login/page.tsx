@@ -17,6 +17,8 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
+import socket from '@/socket';
+import { ApiResponse } from '@/types';
 
 const AuthContainer = styled(motion.div)(({ theme }) => ({
     display: 'flex',
@@ -57,6 +59,7 @@ export default function LoginPage() {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
+                socket.emit("login");
                 router.push('/dashboard');
             }
         });
@@ -82,11 +85,9 @@ export default function LoginPage() {
                     },
                     body: JSON.stringify({ token })
                 });
+                const data = (await res.json()) as ApiResponse<{ token: string }>;
+                if (!res.ok || !data.status) throw new Error(data?.message || 'Login failed at server.');
 
-                if (!res.ok) {
-                    const data = await res.json();
-                    throw new Error(data?.message || 'Login failed at server.');
-                }
                 enqueueSnackbar('Login successful!', { variant: 'success' });
                 // Store token in localStorage if rememberMe is checked
                 if (rememberMe) {
@@ -94,11 +95,11 @@ export default function LoginPage() {
                 } else {
                     sessionStorage.setItem('authToken', token);
                 }
+                socket.emit("login", data.data?.token);
                 router.push('/dashboard');
             }
         } catch (err: any) {
             setError(getFirebaseError(err.code || err.message));
-        } finally {
             setLoading(false);
         }
     };

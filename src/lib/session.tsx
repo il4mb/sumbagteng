@@ -2,9 +2,9 @@
 import { cookies } from 'next/headers';
 import { SignJWT, jwtVerify } from 'jose';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_TOKEN as string);
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET as string);
 
-export type UserInfo = { uid: string, email: string, role: 'admin' | 'user', name: string | null }
+export type UserInfo = { uid: string, role: 'admin' | 'user', name: string | null }
 
 // Sign full user object into JWT
 function sign(payload: object): Promise<string> {
@@ -22,7 +22,7 @@ async function verify<T>(token: string): Promise<T> {
 }
 
 // Store full user session in a cookie
-export async function setSession(value: UserInfo): Promise<UserInfo> {
+export async function setSession(value: UserInfo): Promise<string> {
     const token = await sign(value as any);
 
     (await cookies()).set('session', token, {
@@ -33,7 +33,7 @@ export async function setSession(value: UserInfo): Promise<UserInfo> {
         maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
-    return value;
+    return token;
 }
 
 // Read full user session from cookie

@@ -3,19 +3,20 @@
 import { ChatRounded } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 import * as React from 'react';
-import { MappedRequest } from '../client/RequestGrid';
+import { useChat } from './ChatProvider';
 
 export interface IChatButtonProps {
-    row: MappedRequest;
+    designId: string;
 }
 
-export default function ChatButton(props: IChatButtonProps) {
-    const { row } = props;
+export default function ChatButton({ designId }: IChatButtonProps) {
+
+    const { openChatWindow } = useChat();
 
     return (
         <>
-            <Tooltip title={`Chat with ${row.type} request ID: ${row.id}`} arrow>
-                <IconButton>
+            <Tooltip title={`Open chat ID: ${designId}`} arrow>
+                <IconButton onClick={() => openChatWindow(designId)}>
                     <ChatRounded />
                 </IconButton>
             </Tooltip>

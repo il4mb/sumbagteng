@@ -1,8 +1,10 @@
+import GridDesign from '@/componens/admin/designs/GridDesign';
+import ChatsListDialog from '@/componens/chats/ChatsListDialog';
 import Header from '@/componens/ui/Header';
 import ProfileAction from '@/componens/ui/ProfileAction';
-import { Container } from '@mui/material';
+import { Container, Stack } from '@mui/material';
 
-export default function DesignPage() {
+export default async function DesignPage() {
     return (
         <Container maxWidth="xl">
             <Header
@@ -11,7 +13,16 @@ export default function DesignPage() {
                     { label: 'Home', path: '/dashboard' },
                     { label: 'Designs', path: '/dashboard/designs' },
                 ]}
-                actions={<ProfileAction />} />
+                actions={
+                    <Stack direction="row" spacing={4} alignItems="center">
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <ChatsListDialog />
+                        </Stack>
+                        <ProfileAction />
+                    </Stack>
+                } online />
+
+            <GridDesign />
         </Container>
     );
 }

@@ -1,35 +1,56 @@
 "use client"
+import { db } from '@/firebase/config';
 import socket from '@/socket';
 import { User } from '@/types';
 import { Avatar, Badge, Stack, Tooltip, Typography } from '@mui/material';
+import { doc, getDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 export default function WhoseOnline() {
-    const [users, setUsers] = useState<User[]>([
-        {
-            id: '123',
-            name: 'Ilham B',
-            role: 'admin'
-        },
-        {
-            id: '123',
-            name: 'Ilham B',
-            role: 'admin'
-        }
-    ]);
+    const [uids, setUids] = useState<string[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
 
     useEffect(() => {
-        const callbackHandler = (user: User) => {
-            setUsers(prev => [...prev.filter(u => u.id !== user.id), user]);
-        }
-
-        socket.on("user-online", callbackHandler);
-
+        const callbackHandler = (uids: string[]) => setUids(uids);
+        socket.on("online-users", callbackHandler);
+        socket.emit("seek-online-users");
         return () => {
-            socket.off("user-online", callbackHandler);
+            socket.off("online-users", callbackHandler);
         }
     }, []);
+
+    useEffect(() => {
+
+        if (uids.length === 0) {
+            setUsers([]);
+            return;
+        }
+
+        async function fetchUsers() {
+            try {
+                // Map over uids and fetch user doc for each uid
+                const userPromises = uids.map(async (uid) => {
+                    const docRef = doc(db, 'users', uid);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        return { id: uid, ...docSnap.data() } as User;
+                    } else {
+                        return null;
+                    }
+                });
+
+                const usersData = await Promise.all(userPromises);
+                // Filter out any nulls (non-existent users)
+                setUsers(usersData.filter(Boolean) as User[]);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        }
+
+        fetchUsers();
+    }, [uids]);
+
 
     const container = {
         hidden: { opacity: 0 },
@@ -48,15 +69,6 @@ export default function WhoseOnline() {
 
     return (
         <Stack spacing={2} sx={{ p: 2 }}>
-            <Typography variant="h6" component="h2">
-                Who's Online
-                <Badge
-                    badgeContent={users.length}
-                    color="success"
-                    sx={{ ml: 1.5 }}
-                />
-            </Typography>
-
             <AnimatePresence>
                 <motion.div
                     variants={container}
@@ -73,7 +85,7 @@ export default function WhoseOnline() {
                                 animate="show"
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}>
-                                <Tooltip title={`${user.name} is online`} arrow> 
+                                <Tooltip title={`${user.name} is online`} arrow>
                                     <Badge
                                         overlap="circular"
                                         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}

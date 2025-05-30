@@ -9,6 +9,7 @@ import { addDoc, collection } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '../AuthProvider';
+import { AddRequest } from '@/action/request';
 
 export default function CreateRequestDialogButton() {
 	const [open, setOpen] = useState(false);
@@ -48,30 +49,28 @@ const DesignRequestButton = ({ onCloseParent }: { onCloseParent: () => void }) =
 	const { user } = useAuth();
 	const { enqueueSnackbar } = useSnackbar();
 	const [open, setOpen] = useState(false);
-	const [data, setData] = useState<DesignFormData>({ size: 'A4', theme: '', reference: [], description: '' });
+	const [data, setData] = useState<DesignFormData>({ name: '', size: 'A4', theme: '', images: [], description: '' });
 	const [loading, setLoading] = useState(false);
 
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (loading || !user?.uid) return;
 		setLoading(true);
 		try {
-			const c = collection(db, 'designs');
-			console.log('Submitting Design Request:', data);
-			addDoc(c, { ...data, createdAt: new Date(), updatedAt: new Date(), createdBy: user.uid, status: 'pending' })
-				.then(() => {
-					enqueueSnackbar('Design Request submitted successfully!', { variant: 'success' });
-					setLoading(false);
-					handleClose();
-					onCloseParent();
-				})
-				.catch((error) => {
-					console.error('Error submitting Design Request:', error);
-					enqueueSnackbar('Failed to submit Design Request. Please try again.', { variant: 'error' });
-					setLoading(false);
-				})
+			const response = await AddRequest({
+				type: 'design',
+				data
+			});
+			if (!response?.status) {
+				throw new Error(response?.message || "Caught an Error");
+			}
+			enqueueSnackbar('Design Request submitted successfully!', { variant: 'success' });
+			setLoading(false);
+			handleClose();
+			onCloseParent();
+			
 		} catch (error) {
 			console.error('Unexpected error submitting Design Request:', error);
 			enqueueSnackbar('An unexpected error occurred. Please try again.', { variant: 'error' });
@@ -127,7 +126,7 @@ const ProductionRequestButton = ({ onCloseParent }: { onCloseParent: () => void 
 	const { user } = useAuth();
 	const { enqueueSnackbar } = useSnackbar();
 	const [open, setOpen] = useState(false);
-	const [data, setData] = useState<ProductionFormData>({ location: '', cluster: '', allocation: '', quantity: 1, designRef: '' });
+	const [data, setData] = useState<ProductionFormData>({ location: '', cluster: '', allocation: '', quantity: 1, designRef: '', description: '' });
 	const [loading, setLoading] = useState(false);
 
 	const handleOpen = () => setOpen(true);

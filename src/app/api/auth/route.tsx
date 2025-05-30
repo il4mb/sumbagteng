@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
         if (!token) {
             return NextResponse.json(
-                { status: "error", message: "Token is required" },
+                { status: false, message: "Token is required" },
                 { status: 400 }
             );
         }
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
         if (!decoded || !decoded.uid) {
             return NextResponse.json(
-                { status: "error", message: "Invalid token" },
+                { status: false, message: "Invalid token" },
                 { status: 401 }
             );
         }
@@ -25,13 +25,13 @@ export async function POST(req: NextRequest) {
         const userRecord = await adminAuth.getUser(decoded.uid);
         if (!userRecord) {
             return NextResponse.json(
-                { status: "error", message: "User not found" },
+                { status: false, message: "User not found" },
                 { status: 404 }
             );
         }
         if (userRecord.disabled) {
             return NextResponse.json(
-                { status: "error", message: "User is disabled" },
+                { status: false, message: "User is disabled" },
                 { status: 403 }
             );
         }
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
             return NextResponse.json(
-                { status: "error", message: "User not found in database" },
+                { status: false, message: "User not found in database" },
                 { status: 404 }
             );
         }
@@ -48,27 +48,26 @@ export async function POST(req: NextRequest) {
         const userData = userDoc.data();
         if (!userData || !userData.role) {
             return NextResponse.json(
-                { status: "error", message: "User role not found" },
+                { status: false, message: "User role not found" },
                 { status: 403 }
             );
         }
 
         const sessionData = {
             uid: decoded.uid,
-            email: decoded.email,
             role: userData.role,
             name: decoded.name || null,
         };
 
-        await setSession(sessionData);
+        const sessionToken = await setSession(sessionData);
 
         return NextResponse.json(
-            { status: "success", message: "Login successful", data: sessionData },
+            { status: true, message: "Login successful", data: { token: sessionToken } },
             { status: 200 }
         );
     } catch (err: any) {
         return NextResponse.json(
-            { status: "error", message: err.message || "Internal error" },
+            { status: false, message: err.message || "Internal error" },
             { status: 500 }
         );
     }
@@ -92,7 +91,7 @@ export async function DELETE() {
         return res;
     } catch (err: any) {
         return NextResponse.json(
-            { status: "error", message: err.message || "Internal error" },
+            { status: false, message: err.message || "Internal error" },
             { status: 500 }
         );
     }

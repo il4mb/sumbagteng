@@ -39,34 +39,34 @@ export default async function ConfirmDesign({ params }: IConfirmDesignProps) {
         );
     }
 
-    const designRef = adminDb.doc(`designs/${id}`);
-    const designSnap = await designRef.get();
+    const productionRef = adminDb.doc(`productions/${id}`);
+    const productionSnap = await productionRef.get();
 
-    if (!designSnap.exists) {
+    if (!productionSnap.exists) {
         return (
             <Box sx={{ textAlign: 'center', p: 4 }}>
                 <ErrorOutlineIcon color="error" sx={{ fontSize: 60, mb: 2 }} />
                 <Typography variant="h5" gutterBottom>
-                    Design Not Found
+                    Production Not Found
                 </Typography>
                 <Typography variant="body1">
-                    The requested design could not be found
+                    The requested production could not be found
                 </Typography>
             </Box>
         );
     }
 
-    const design = designSnap.data() as DesignRequest;
+    const production = productionSnap.data() as DesignRequest;
 
-    if (design.executorId && design.executorId !== user.uid) {
+    if (production.executorId && production.executorId !== user.uid) {
         return (
             <Box sx={{ textAlign: 'center', p: 4 }}>
                 <ErrorOutlineIcon color="warning" sx={{ fontSize: 60, mb: 2 }} />
                 <Typography variant="h5" gutterBottom>
-                    Design Already Taken
+                    Production Already Taken
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 3 }}>
-                    This design has already been assigned to another executor
+                    This production has already been assigned to another!
                 </Typography>
                 <Button
                     variant="outlined"
@@ -79,8 +79,8 @@ export default async function ConfirmDesign({ params }: IConfirmDesignProps) {
         );
     }
 
-    if (!design.executedBy || design.status == "pending") {
-        await designRef.update({
+    if (!production.executedBy || production.status == "pending") {
+        await productionRef.update({
             executedBy: user.uid,
             status: 'accepted'
         });
@@ -91,12 +91,12 @@ export default async function ConfirmDesign({ params }: IConfirmDesignProps) {
             <Box sx={{ textAlign: 'center', p: 4, mt: 4 }}>
                 <CheckCircleOutlineIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
                 <Typography variant="h4" gutterBottom color="success.main">
-                    Design Confirmed!
+                    Production Confirmed!
                 </Typography>
 
                 <Stack spacing={1} sx={{ maxWidth: 400, mx: 'auto', my: 3, textAlign: 'left' }}>
                     <Typography variant="body1">
-                        <strong>Design ID:</strong> {id}
+                        <strong>Request ID:</strong> {id}
                     </Typography>
                     <Typography variant="body1">
                         <strong>Confirmed by:</strong> {user.uid}
@@ -109,10 +109,10 @@ export default async function ConfirmDesign({ params }: IConfirmDesignProps) {
                 <Button
                     variant="contained"
                     LinkComponent={Link}
-                    href={`/dashboard/admin/designs`}
+                    href={`/dashboard/admin/productions`}
                     sx={{ mt: 3 }}
                     startIcon={<DesignServicesIcon />}>
-                    Go To Designs
+                    Go To Productions
                 </Button>
             </Box>
         </Box>

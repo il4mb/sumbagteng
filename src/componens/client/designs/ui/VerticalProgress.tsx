@@ -59,8 +59,8 @@ const progressSteps = [
         description: 'Your order has been accepted by our executive'
     },
     {
-        title: "It's Ready",
-        description: 'Your order is marked as ready'
+        title: "It's Complete",
+        description: 'Your order is marked as complete by taker'
     },
     {
         title: 'Confirmed',
@@ -69,10 +69,10 @@ const progressSteps = [
 ];
 
 import { RequestStatus } from '@/types';
-const StatusList = ["pending", "accepted", "ready", "completed"] as const;
+const StatusList = ["pending", "accepted", "complete", "finished"] as const;
 
 export const StatusProgress = ({ status }: { status: RequestStatus }) => {
-    const currentIndex = StatusList.indexOf(status) + 1;
+    const currentIndex = (status == "finished" ? StatusList.length : StatusList.indexOf(status)) + 1;
     return (
         <VerticalProgress steps={progressSteps} currentStep={currentIndex} />
     );

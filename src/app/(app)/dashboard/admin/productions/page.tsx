@@ -1,3 +1,4 @@
+import GridProduction from '@/componens/admin/productions/GridProduction';
 import Header from '@/componens/ui/Header';
 import ProfileAction from '@/componens/ui/ProfileAction';
 import { Container } from '@mui/material';
@@ -12,6 +13,7 @@ export default function DesignPage() {
                     { label: 'Productions', path: '/dashboard/productions' },
                 ]}
                 actions={<ProfileAction />} />
+            <GridProduction />
         </Container>
     );
 }

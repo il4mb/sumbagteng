@@ -1,3 +1,8 @@
+export type ApiResponse<T = unknown> = {
+	status: boolean;
+	message: string;
+	data?: T
+}
 export type Chat = {
 	id: string;
 	ref: {
@@ -21,20 +26,21 @@ export type User = {
 }
 
 // Enum-style literal union for better clarity
-export type RequestStatus =
+ export type RequestStatus =
 	| "pending"
 	| "accepted"
-	| "ready"
-	| "completed";
+	| "complete"
+	| "finished";
 
 // Base Request type
 export interface RequestBase {
 	id: string;
-	userId: string;
+	createdBy: string;
 	status: RequestStatus;
-	createdAt?: Date;
+	createdAt: Date;
 	updatedAt?: Date;
 	description?: string;
+	executedBy?: string;
 }
 
 // Design-specific request
@@ -43,27 +49,31 @@ export interface DesignRequest extends RequestBase {
 	name: string;
 	size: string;
 	theme: string;
-	reference?: string[]; // URLs or IDs
-	revision: Array<{
-		number: number;
-		description?: string;
-	}>;
-	image?: string;
+	images: string[];
 	executorId?: string;
 }
 
 // Production-specific request
 export interface ProductionRequest extends RequestBase {
 	type: "production";
+	title: string;
 	location: string;
 	cluster: string;
 	allocation: string;
 	quantity: number;
-	design?: {
-		type: "design" | "custom";
-		design: string; // design ID or URL
-	};
+	designRef?: string;
 }
 
 // Unified request union for processing or filtering
 export type AnyRequest = DesignRequest | ProductionRequest;
+
+
+export type Completion = {
+	id: string;
+	image: string;
+	message: string;
+	completedAt: Date;
+	updatedAt?: Date;
+	status: "pending" | "rejected" | "accepted";
+	rejectMessage?: string;
+};
