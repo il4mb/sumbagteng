@@ -282,10 +282,12 @@ const CompletionList = ({ id, status }: { id: string; status: RequestStatus; }) 
     const [completions, setCompletions] = useState<Completion[]>([]);
 
     useEffect(() => {
+
+        console.log(id)
         if (!id) return;
 
         const coll = collection(db, "designs", id, "completions");
-        const q = query(coll, orderBy("completeAt", "asc"));
+        const q = query(coll, orderBy("completedAt", "asc"));
 
         const unsub = onSnapshot(q, (snap) => {
             const data: Completion[] = snap.docs.map((doc) => {
@@ -299,6 +301,8 @@ const CompletionList = ({ id, status }: { id: string; status: RequestStatus; }) 
                     rejectMessage: d.rejectMessage
                 };
             });
+
+            console.log(data)
 
             setCompletions(data);
         });

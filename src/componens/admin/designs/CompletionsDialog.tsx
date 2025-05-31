@@ -26,7 +26,7 @@ export default function CompletionsDialog({ designId, text }: ICompletionsDialog
         if (!designId) return;
 
         const coll = collection(db, "designs", designId, "completions");
-        const q = query(coll, orderBy("completeAt", "asc"));
+        const q = query(coll, orderBy("completedAt", "asc"));
 
         const unsub = onSnapshot(q, (snap) => {
             // @ts-ignore
