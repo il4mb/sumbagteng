@@ -179,8 +179,7 @@ export default function GridDesign({ height = 600 }: IGridDesignProps) {
                         zIndex: 1
                     }}
                     onClick={handleReload}
-                    disabled={loading}
-                >
+                    disabled={loading}>
                     <Refresh />
                 </IconButton>
             </Tooltip>

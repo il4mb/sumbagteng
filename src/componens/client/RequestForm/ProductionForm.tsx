@@ -1,24 +1,33 @@
 "use client"
 
 import { db } from "@/firebase/config";
-import { TouchAppRounded } from "@mui/icons-material";
+import { TouchAppRounded, UploadFile } from "@mui/icons-material";
 import { Stack, TextField, MenuItem, Box, Grid, InputAdornment } from "@mui/material";
 import { collection, onSnapshot } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import SelectDesignDialog from "./SelectDesignDialog";
+import ImagePickerButton from "@/componens/ui/ImagePickerButton";
 
 export interface IProductionFormProps {
     data: ProductionFormData;
     onUpdate: Dispatch<SetStateAction<ProductionFormData>>;
 }
 
+type DesignRef = {
+    type: 'design';
+    value: string;
+}
+type UploadRef = {
+    type: 'upload';
+    value: File;
+}
 export type ProductionFormData = {
     location: string;
     cluster: string;
     allocation: string;
     quantity: number;
-    designRef: string;
+    designRef: DesignRef | UploadRef;
     description: string;
 };
 
@@ -64,24 +73,6 @@ export default function ProductionForm({ data, onUpdate }: IProductionFormProps)
         if (errors[name as keyof ProductionFormData]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
-    };
-
-    const validateForm = (): boolean => {
-        const newErrors: Partial<typeof errors> = {};
-
-        if (!location) newErrors.location = 'Location is required';
-        if (!cluster) newErrors.cluster = 'Cluster is required';
-        if (!allocation) newErrors.allocation = 'Allocation is required';
-        if (quantity <= 0) newErrors.quantity = 'Quantity must be greater than 0';
-        if (!designRef) newErrors.designRef = 'Design reference is required';
-        if (description && description.length > 500) {
-            newErrors.description = 'Description cannot exceed 500 characters';
-        } else if (description && description.length < 10) {
-            newErrors.description = 'Description must be at least 10 characters';
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
     };
 
     return (
@@ -168,10 +159,7 @@ export default function ProductionForm({ data, onUpdate }: IProductionFormProps)
                             <TextField
                                 label="Design Reference"
                                 name="designRef"
-                                value={designRef}
-                                onChange={handleInputChange}
-                                error={!!errors.designRef}
-                                helperText={errors.designRef}
+                                value={`${designRef?.type == "design" ? `DESIGN: ${designRef?.value}` : designRef?.type == 'upload' ? `UPLOAD: ${designRef?.value.name}` : "NONE"}`}
                                 fullWidth
                                 required
                                 placeholder="Enter design ID or reference number"
@@ -180,7 +168,26 @@ export default function ProductionForm({ data, onUpdate }: IProductionFormProps)
                                         sx: { pr: 0, mr: 0 },
                                         endAdornment: (
                                             <InputAdornment position="end">
-                                                <SelectDesignDialog onSelect={(id) => { onUpdate(prev => ({ ...prev, designRef: id })) }} />
+                                                <ImagePickerButton
+                                                    onPick={(file) => {
+                                                        onUpdate(prev => ({
+                                                            ...prev,
+                                                            designRef: {
+                                                                value: file,
+                                                                type: 'upload'
+                                                            }
+                                                        }))
+                                                    }} />
+                                                <SelectDesignDialog
+                                                    onSelect={(id) => {
+                                                        onUpdate(prev => ({
+                                                            ...prev,
+                                                            designRef: {
+                                                                value: id,
+                                                                type: 'design'
+                                                            }
+                                                        }))
+                                                    }} />
                                             </InputAdornment>
                                         )
                                     }

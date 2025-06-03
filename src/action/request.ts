@@ -123,8 +123,31 @@ export const AddRequest = async (props: AddRequestProps) => {
 
 
         } else if (props.type === "production") {
-            const productionData = props.data;
-            // handle production logic
+            const { location, cluster, allocation, quantity, designRef, description } = props.data;
+
+            const request = { location, cluster, allocation, quantity, description, design: {} }
+            if (designRef.type == "upload") {
+                const objectKey = `production/${Date.now()}-${randomUUID()}.webp`;
+                const buffer = Buffer.from(await designRef.value.arrayBuffer());
+                await uploadFile(buffer, objectKey);
+                request.design = {
+                    type: 'upload',
+                    value: objectKey
+                }
+            } else {
+                request.design = {
+                    type: 'design',
+                    value: designRef.value
+                }
+            }
+
+            const productionRef = db.collection("productions");
+            await productionRef.add({
+                ...request,
+                createdBy: user.uid,
+                createdAt: new Date(),
+                status: 'pending',
+            });
 
             return {
                 status: true,

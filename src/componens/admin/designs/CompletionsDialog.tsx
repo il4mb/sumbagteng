@@ -37,7 +37,7 @@ export default function CompletionsDialog({ designId, text }: ICompletionsDialog
                     status: d.status ?? "pending",
                     image: d.image ?? "",
                     message: d.message ?? "",
-                    completeAt: d.completeAt?.toDate?.() ?? new Date(),
+                    completedAt: d.completedAt?.toDate?.() ?? new Date(),
                     rejectMessage: d.rejectMessage
                 };
             });

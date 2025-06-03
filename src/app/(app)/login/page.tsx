@@ -95,8 +95,10 @@ export default function LoginPage() {
                 } else {
                     sessionStorage.setItem('authToken', token);
                 }
-                socket.emit("login", data.data?.token);
+                
                 router.push('/dashboard');
+                socket.emit("login", data.data?.token);
+                
             }
         } catch (err: any) {
             setError(getFirebaseError(err.code || err.message));

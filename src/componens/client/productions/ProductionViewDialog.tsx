@@ -1,5 +1,5 @@
 "use client"
-import { Balance, Celebration, Description, LocationCity, OpenInBrowserRounded, Place } from '@mui/icons-material';
+import { Balance, Celebration, Description, ImageRounded, LocationCity, OpenInBrowserRounded, Pallet, Place } from '@mui/icons-material';
 import {
     Dialog,
     DialogContent,
@@ -19,8 +19,8 @@ import {
 } from '@mui/material';
 import { MappedRequest } from '../RequestGrid';
 import { useEffect, useState } from 'react';
-import { ProductionRequest, RequestStatus, User } from '@/types';
-import { doc, getDoc, onSnapshot, Timestamp } from "firebase/firestore";
+import { DesignRequest, ProductionRequest, RequestStatus, User } from '@/types';
+import { collection, doc, getDoc, getDocs, limit, onSnapshot, query, Timestamp, where } from "firebase/firestore";
 import { db } from '@/firebase/config';
 import DialogHeader from '@/componens/ui/DialogHeader';
 
@@ -72,6 +72,7 @@ const DialogDetailProduction = ({ row, open, onClose }: DialogProps) => {
     const [production, setProduction] = useState<ProductionRequest | undefined | null>();
     const [location, setLocation] = useState<Location>();
     const [cluster, setCluster] = useState<Cluster>();
+    const [design, setDesign] = useState<string | null>(null);
 
     useEffect(() => {
         const docRef = doc(db, "productions", row.id);
@@ -112,6 +113,20 @@ const DialogDetailProduction = ({ row, open, onClose }: DialogProps) => {
                 ...snap.data()
             } as User);
         }
+        const fetchDesign = async () => {
+            if (production?.design?.type == "design") {
+                const designId = production.design.value;
+                const completionRef = collection(db, "designs", designId, "completions");
+                const queryCompletion = query(completionRef, where("status", "==", "accepted"), limit(1));
+                const completion = (await getDocs(queryCompletion)).docs[0].data();
+                if (completion) {
+                    setDesign(completion.image);
+                }
+            } else if (production?.design?.type == "upload") {
+                setDesign("/storage/" + production.design.value.replace(/^\//, ''));
+            }
+        }
+        fetchDesign();
         fetchExecutor();
     }, [production?.id]);
 
@@ -210,6 +225,15 @@ const DialogDetailProduction = ({ row, open, onClose }: DialogProps) => {
                                         }}>
                                         {production?.description || 'No description provided'}
                                     </Typography>
+                                </Stack>
+                            </Stack>
+                            <Stack direction="row" spacing={2} alignItems="flex-start">
+                                <Pallet color="action" sx={{ mt: 2 }} />
+                                <Stack>
+                                    <Typography gutterBottom><strong>Design:</strong></Typography>
+                                    <Avatar src={design || ""} variant='rounded' sx={{ width: 250, height: 200 }}>
+                                        <ImageRounded sx={{ width: 150, height: 100 }} />
+                                    </Avatar>
                                 </Stack>
                             </Stack>
                         </Collapse>

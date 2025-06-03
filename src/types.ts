@@ -26,7 +26,7 @@ export type User = {
 }
 
 // Enum-style literal union for better clarity
- export type RequestStatus =
+export type RequestStatus =
 	| "pending"
 	| "accepted"
 	| "complete"
@@ -61,7 +61,10 @@ export interface ProductionRequest extends RequestBase {
 	cluster: string;
 	allocation: string;
 	quantity: number;
-	designRef?: string;
+	design?: {
+		type: 'design' | 'upload';
+		value: string;
+	};
 }
 
 // Unified request union for processing or filtering

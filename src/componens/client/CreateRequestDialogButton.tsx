@@ -10,6 +10,7 @@ import { db } from '@/firebase/config';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '../AuthProvider';
 import { AddRequest } from '@/action/request';
+import ConfirmDialogButton from '../ui/ConfirmDialogButton';
 
 export default function CreateRequestDialogButton() {
 	const [open, setOpen] = useState(false);
@@ -70,7 +71,7 @@ const DesignRequestButton = ({ onCloseParent }: { onCloseParent: () => void }) =
 			setLoading(false);
 			handleClose();
 			onCloseParent();
-			
+
 		} catch (error) {
 			console.error('Unexpected error submitting Design Request:', error);
 			enqueueSnackbar('An unexpected error occurred. Please try again.', { variant: 'error' });
@@ -108,13 +109,18 @@ const DesignRequestButton = ({ onCloseParent }: { onCloseParent: () => void }) =
 				</DialogContent>
 				<DialogActions sx={{ px: 2 }}>
 					<Button onClick={handleClose} color="primary" disabled={loading}>Cancel</Button>
-					<Button
-						disabled={loading}
-						onClick={() => { handleSubmit(); }}
-						variant='contained'
-						type="submit"
-						form="design-form"
-						color="primary">Submit</Button>
+					<ConfirmDialogButton
+						onConfirm={() => handleSubmit()}
+						variant='primary'
+						title='Are you sure?'
+						message={<>Please make sure all input is correct and matches what you want.<br /> This action cannot be undone.</>}
+						slotProps={{
+							button: {
+								children: 'Submit',
+								disabled: loading,
+								variant: 'contained'
+							}
+						}} />
 				</DialogActions>
 			</Dialog>
 		</>
@@ -126,30 +132,26 @@ const ProductionRequestButton = ({ onCloseParent }: { onCloseParent: () => void 
 	const { user } = useAuth();
 	const { enqueueSnackbar } = useSnackbar();
 	const [open, setOpen] = useState(false);
-	const [data, setData] = useState<ProductionFormData>({ location: '', cluster: '', allocation: '', quantity: 1, designRef: '', description: '' });
+	const [data, setData] = useState<ProductionFormData>({ location: '', cluster: '', allocation: '', quantity: 1, designRef: { type: 'design', value: '' }, description: '' });
 	const [loading, setLoading] = useState(false);
 
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (loading || !user?.uid) return;
 		setLoading(true);
 		try {
-			const c = collection(db, 'productions');
-			console.log('Submitting Design Request:', data);
-			addDoc(c, { ...data, createdAt: new Date(), updatedAt: new Date(), createdBy: user.uid, status: 'pending' })
-				.then(() => {
-					enqueueSnackbar('Design Request submitted successfully!', { variant: 'success' });
-					setLoading(false);
-					handleClose();
-					onCloseParent();
-				})
-				.catch((error) => {
-					console.error('Error submitting Design Request:', error);
-					enqueueSnackbar('Failed to submit Design Request. Please try again.', { variant: 'error' });
-					setLoading(false);
-				})
+			const response = await AddRequest({ type: 'production', data });
+			if (!response?.status) {
+				throw new Error(response?.message || "Caught an Error");
+			}
+
+			enqueueSnackbar('Production Request submitted successfully!', { variant: 'success' });
+			setLoading(false);
+			handleClose();
+			onCloseParent();
+
 		} catch (error) {
 			console.error('Unexpected error submitting Design Request:', error);
 			enqueueSnackbar('An unexpected error occurred. Please try again.', { variant: 'error' });
@@ -182,13 +184,18 @@ const ProductionRequestButton = ({ onCloseParent }: { onCloseParent: () => void 
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={handleClose} color="primary" disabled={loading}>Cancel</Button>
-					<Button
-						disabled={loading}
-						onClick={() => { handleSubmit(); }}
-						variant='contained'
-						type="submit"
-						form="production-form"
-						color="primary">Submit</Button>
+					<ConfirmDialogButton
+						onConfirm={() => handleSubmit()}
+						variant='primary'
+						title='Are you sure?'
+						message={<>Please make sure all input is correct and matches what you want.<br /> This action cannot be undone.</>}
+						slotProps={{
+							button: {
+								children: 'Submit',
+								disabled: loading,
+								variant: 'contained'
+							}
+						}} />
 				</DialogActions>
 			</Dialog>
 		</>
