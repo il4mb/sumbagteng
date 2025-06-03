@@ -182,7 +182,7 @@ export default function UserListManager() {
                         label="Delete"
                         onClick={handleDeleteClick(id)}
                         color="inherit"
-                        style={{ display: user?.uid == id ? "none" : "block" }}
+                        style={{ display: user?.id == id ? "none" : "block" }}
                     />,
                 ];
             },

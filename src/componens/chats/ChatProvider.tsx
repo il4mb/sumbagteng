@@ -137,9 +137,9 @@ export default function ChatProvider({ children }: ChatProviderProps) {
 
     // Subscribe to user's chats
     useEffect(() => {
-        if (!user?.uid) return;
+        if (!user?.id) return;
 
-        const uid = user.uid;
+        const uid = user.id;
         const designsRef = collection(db, "designs");
         const userDesignsQuery = query(
             designsRef,
@@ -200,7 +200,7 @@ export default function ChatProvider({ children }: ChatProviderProps) {
             unsub2();
             unsubscribes.forEach(unsub => unsub());
         };
-    }, [user?.uid, processChatSnapshot, updateChats]);
+    }, [user?.id, processChatSnapshot, updateChats]);
 
     // Chat window handlers
     const closeChatWindow = useCallback((chatId: string) => {

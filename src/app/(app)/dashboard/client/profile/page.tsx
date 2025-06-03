@@ -1,10 +1,12 @@
-export interface IAppProps {
-}
+import ProfileManager from "@/componens/ProfileManager";
+import Header from "@/componens/ui/Header";
+import { Container } from "@mui/material";
 
-export default function App(props: IAppProps) {
+export default function App() {
     return (
-        <div>
-
-        </div>
+        <Container maxWidth="lg">
+            <Header title="Profile" backbutton />
+            <ProfileManager />
+        </Container>
     );
 }

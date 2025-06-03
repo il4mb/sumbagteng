@@ -7,11 +7,9 @@ import {
     onSnapshot,
     getDocs,
     DocumentData,
-    CollectionReference,
     QueryDocumentSnapshot
 } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { User } from "firebase/auth";
 import { useAuth } from "../AuthProvider";
 
 interface Chat {
@@ -33,9 +31,9 @@ export const useUserChats = () => {
     const [chats, setChats] = useState<Chat[]>([]);
 
     useEffect(() => {
-        if (!user?.uid) return;
+        if (!user?.id) return;
 
-        const uid = user.uid;
+        const uid = user.id;
         const designsRef = collection(db, "designs");
 
         const q1 = query(designsRef, where("createdBy", "==", uid));
@@ -75,7 +73,7 @@ export const useUserChats = () => {
         return () => {
             unsubscribes.forEach(unsub => unsub());
         };
-    }, [user?.uid]);
+    }, [user?.id]);
 
     return chats;
 };

@@ -92,7 +92,7 @@ export default function WhoseOnline() {
                                         variant="dot"
                                         color="success">
                                         <Avatar
-                                            src={user.photo}
+                                            src={user.photo?.startsWith('http') ? user.photo : '/storage/' + user.photo}
                                             alt={user.name}
                                             sx={{ width: 40, height: 40 }}
                                         />

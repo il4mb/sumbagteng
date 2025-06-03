@@ -20,15 +20,15 @@ export default function MessageFragment({ message }: IMessageFragmentProps) {
             key={message.id}
             sx={{
                 display: 'flex',
-                justifyContent: message?.sendBy?.id === user?.uid ? 'flex-end' : 'flex-start',
+                justifyContent: message?.sendBy?.id === user?.id ? 'flex-end' : 'flex-start',
                 mb: 2
             }}>
             <Stack
-                direction={message?.sendBy?.id === user?.uid ? 'row-reverse' : 'row'}
+                direction={message?.sendBy?.id === user?.id ? 'row-reverse' : 'row'}
                 spacing={1}
                 alignItems="flex-end"
                 sx={{ maxWidth: '80%' }}>
-                {message?.sendBy?.id !== user?.uid && (
+                {message?.sendBy?.id !== user?.id && (
                     <Avatar
                         src={message?.sendBy?.photo}
                         alt={message?.sendBy?.name}
@@ -40,22 +40,22 @@ export default function MessageFragment({ message }: IMessageFragmentProps) {
                     sx={{
                         p: 1.5,
                         borderRadius: 2,
-                        bgcolor: message?.sendBy?.id === user?.uid
+                        bgcolor: message?.sendBy?.id === user?.id
                             ? theme.palette.primary.main
                             : theme.palette.background.paper,
-                        color: message?.sendBy?.id === user?.uid
+                        color: message?.sendBy?.id === user?.id
                             ? theme.palette.primary.contrastText
                             : theme.palette.text.primary,
                         boxShadow: theme.shadows[1],
                         position: 'relative'
                     }}>
-                    {message?.sendBy?.id !== user?.uid && (
+                    {message?.sendBy?.id !== user?.id && (
                         <Typography
                             variant="caption"
                             sx={{
                                 display: 'block',
                                 fontWeight: 600,
-                                color: message?.sendBy?.id === user?.uid
+                                color: message?.sendBy?.id === user?.id
                                     ? theme.palette.primary.light
                                     : theme.palette.text.secondary
                             }}>
@@ -80,7 +80,7 @@ export default function MessageFragment({ message }: IMessageFragmentProps) {
                             {formatDistanceToNow(message.sendAt, { addSuffix: true })}
                         </Typography>
 
-                        {message?.sendBy?.id === user?.uid && (
+                        {message?.sendBy?.id === user?.id && (
                             <CheckCircle
                                 fontSize="inherit"
                                 sx={{

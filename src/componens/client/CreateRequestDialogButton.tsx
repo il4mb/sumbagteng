@@ -57,7 +57,7 @@ const DesignRequestButton = ({ onCloseParent }: { onCloseParent: () => void }) =
 	const handleClose = () => setOpen(false);
 
 	const handleSubmit = async () => {
-		if (loading || !user?.uid) return;
+		if (loading || !user?.id) return;
 		setLoading(true);
 		try {
 			const response = await AddRequest({
@@ -139,7 +139,7 @@ const ProductionRequestButton = ({ onCloseParent }: { onCloseParent: () => void 
 	const handleClose = () => setOpen(false);
 
 	const handleSubmit = async () => {
-		if (loading || !user?.uid) return;
+		if (loading || !user?.id) return;
 		setLoading(true);
 		try {
 			const response = await AddRequest({ type: 'production', data });

@@ -40,11 +40,11 @@ export default function SelectDesignDialog({ onSelect }: ISelectDesignDialogProp
     }
 
     useEffect(() => {
-        if (!user?.uid) return;
+        if (!user?.id) return;
         const c = collection(db, 'designs');
         const w = query(c,
             where('status', '==', 'finished'),
-            where('createdBy', '==', user.uid),
+            where('createdBy', '==', user.id),
             orderBy("createdAt", "desc")
         );
         const unsubscribe = onSnapshot(w, async (snapshot) => {
@@ -72,7 +72,7 @@ export default function SelectDesignDialog({ onSelect }: ISelectDesignDialogProp
             setDesigns(designData);
         });
         return () => unsubscribe();
-    }, [user?.uid]);
+    }, [user?.id]);
 
     return (
         <>

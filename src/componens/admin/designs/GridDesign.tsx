@@ -86,7 +86,7 @@ export default function GridDesign({ height = 600 }: IGridDesignProps) {
     const [hasInitialLoad, setHasInitialLoad] = useState(false);
 
     const fetchDesigns = useCallback(() => {
-        if (!user?.uid) {
+        if (!user?.id) {
             setDesigns([]);
             setLoading(false);
             return () => { };
@@ -99,7 +99,7 @@ export default function GridDesign({ height = 600 }: IGridDesignProps) {
         const unsubDesigns = onSnapshot(
             query(
                 collection(db, "designs"),
-                where("executedBy", "==", user.uid),
+                where("executedBy", "==", user.id),
                 orderBy("createdAt", "desc")
             ),
             (snapshot) => {
@@ -132,7 +132,7 @@ export default function GridDesign({ height = 600 }: IGridDesignProps) {
         );
 
         return unsubDesigns;
-    }, [user?.uid]);
+    }, [user?.id]);
 
     useEffect(() => {
         const unsubscribe = fetchDesigns();

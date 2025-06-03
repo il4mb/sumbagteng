@@ -61,14 +61,14 @@ export default function RequestGrid() {
     const { user } = useAuth();
 
     useEffect(() => {
-        if (!user?.uid) return;
+        if (!user?.id) return;
 
         const formatDate = (ts: Timestamp | Date) => ts instanceof Timestamp ? ts.toDate().toLocaleString() : ts.toLocaleString();
 
         const unsubDesigns = onSnapshot(
             query(
                 collection(db, "designs"),
-                where("createdBy", "==", user.uid),
+                where("createdBy", "==", user.id),
                 orderBy("createdAt", "desc")
             ),
             (snapshot) => {
@@ -99,7 +99,7 @@ export default function RequestGrid() {
         const unsubProductions = onSnapshot(
             query(
                 collection(db, "productions"),
-                where("createdBy", "==", user.uid),
+                where("createdBy", "==", user.id),
                 orderBy("createdAt", "desc")
             ),
             (snapshot) => {
@@ -133,7 +133,7 @@ export default function RequestGrid() {
             unsubDesigns();
             unsubProductions();
         };
-    }, [user?.uid]);
+    }, [user?.id]);
 
     if (loading) {
         return (

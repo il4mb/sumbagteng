@@ -61,7 +61,7 @@ const DialogDetailProduction = ({ productionId, open, onClose }: DialogProps) =>
     const [production, setProduction] = useState<ProductionRequest | undefined | null>();
     const [location, setLocation] = useState<Location>();
     const [cluster, setCluster] = useState<Cluster>();
-    const [design, setDesign] = useState<Design | null>();
+    const [design, setDesign] = useState<Design | string | null>();
 
     useEffect(() => {
         const docRef = doc(db, "productions", productionId);
@@ -106,9 +106,14 @@ const DialogDetailProduction = ({ productionId, open, onClose }: DialogProps) =>
     }, [production?.id]);
 
     useEffect(() => {
-        if (!production?.designRef) return;
-        console.log(production)
-        const designRef = doc(db, 'designs', production.designRef);
+        if (production?.design?.type != "design") {
+            if (production?.design?.type == "upload") {
+                setDesign(production.design.value);
+            }
+            return;
+        }
+
+        const designRef = doc(db, 'designs', production.design.type);
         const unsubscribe = onSnapshot(designRef, async (snapshot) => {
             const data = snapshot.data();
             if (!data) return;
@@ -129,8 +134,6 @@ const DialogDetailProduction = ({ productionId, open, onClose }: DialogProps) =>
 
                 }
             } as Design;
-
-            console.log(design)
 
             setDesign(design)
         });
@@ -254,7 +257,7 @@ const DialogDetailProduction = ({ productionId, open, onClose }: DialogProps) =>
                         <Stack sx={{ mt: 2 }}>
                             <Box>
                                 <Typography fontSize={18} fontWeight={700}>Ref Design</Typography>
-                                <Typography fontSize={14} color="text.secondary">{design?.id}</Typography>
+                                <Typography fontSize={14} color="text.secondary">{typeof design == "object" ? design?.id : 'upload'}</Typography>
                             </Box>
                             <Box sx={{ textAlign: 'center', pb: 4, pt: 2 }}>
                                 <motion.div
@@ -263,7 +266,17 @@ const DialogDetailProduction = ({ productionId, open, onClose }: DialogProps) =>
                                     transition={{ delay: 0.2 }}>
                                     <Avatar
                                         variant="rounded"
-                                        src={design?.completion.image.startsWith("http") ? design?.completion.image : `/storage/${design?.completion.image}`}
+                                        src={typeof design == "object"
+                                            ? (
+                                                design?.completion.image.startsWith("http")
+                                                    ? design?.completion.image
+                                                    : `/storage/${design?.completion.image}`
+                                            )
+                                            : (
+                                                design?.startsWith("http")
+                                                    ? design
+                                                    : `/storage/${design}`
+                                            )}
                                         sx={{ width: 600, height: 600, mx: 'auto' }} >
                                         <ImageRounded />
                                     </Avatar>

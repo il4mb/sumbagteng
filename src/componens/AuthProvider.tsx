@@ -1,11 +1,16 @@
 'use client';
 
 import { useEffect, useState, createContext, useContext } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User as IUser } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/firebase/config';
+import { auth, db } from '@/firebase/config';
 import { Box, CircularProgress } from '@mui/material';
+import { User as OUser } from "@/types";
+import { doc, getDoc } from 'firebase/firestore';
 
+type User = OUser & {
+    email: IUser['email']
+}
 interface AuthContextProps {
     user: User | null;
     loading: boolean;
@@ -23,9 +28,20 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
+    const getUserData = async (uid: string) => {
+        const docRef = doc(db, "users", uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { ...docSnap.data(), id: uid } as OUser;
+        }
+        return null;
+    }
+
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-            setUser(firebaseUser);
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (!firebaseUser?.uid) return;
+            const userData = await getUserData(firebaseUser?.uid);
+            setUser({ name: firebaseUser.displayName, email: firebaseUser.email, ...userData } as User);
             setLoading(false);
 
             if (!firebaseUser) {

@@ -9,25 +9,9 @@ import { db } from '@/firebase/config';
 
 
 export default function ProfileAction() {
-    const auth = useAuth();
-    const [user, setUser] = useState<User | null>(null);
+    const { user} = useAuth();
     const [anchor, setAnchor] = useState<HTMLDivElement | null>(null);
     const open = Boolean(anchor);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const uid = auth.user?.uid;
-            if (!uid) return;
-            const docRef = doc(db, "users", uid);
-            const snap = (await getDoc(docRef));
-            if (!snap.exists()) return;
-            setUser({
-                id: snap.id,
-                ...snap.data()
-            } as User)
-        }
-        fetchData();
-    }, [auth.user?.uid]);
 
     const handleOpen = (e: MouseEvent<HTMLDivElement>) => {
         setAnchor(e.currentTarget);
@@ -41,7 +25,7 @@ export default function ProfileAction() {
         <>
             <Box component={"div"} sx={{ position: 'relative' }} onClick={handleOpen}>
                 <Avatar
-                    src={user?.photo}
+                    src={user?.photo?.startsWith('http') ? user?.photo : '/storage/' + user?.photo}
                     alt={user?.name}
                     sx={{ width: 40, height: 40 }}
 

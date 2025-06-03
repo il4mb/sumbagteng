@@ -1,7 +1,9 @@
 "use server"
 
 import { adminDb, adminAuth } from "@/firebase/config-admin";
+import { uploadFile } from "@/lib/s3-client";
 import { getSession } from "@/lib/session";
+import { randomUUID } from "crypto";
 
 type SUser = {
     id: string;
@@ -119,14 +121,15 @@ export async function ListUser() {
     };
 }
 
-export async function UpdateUser(params: Partial<SUser & { password: null | string }> & { id: string }) {
+export async function UpdateUser(params: Partial<Omit<SUser, 'photo'> & { password: null | string, photo?: File | null, email?: string }> & { id: string }) {
 
     const session = await getSession();
-    if (session?.role !== "admin") {
+    console.log(session?.uid, params.id)
+    if (session?.uid !== params.id && session?.role !== "admin") {
         return { status: false, message: "Permission denied" };
     }
 
-    const { id: uid, password, ...rest } = params;
+    const { id: uid, password, photo, ...rest } = params;
     const updateData: any = { ...rest };
 
     if (!uid) {
@@ -148,7 +151,19 @@ export async function UpdateUser(params: Partial<SUser & { password: null | stri
         adminAuth.updateUser(uid, { password })
     }
 
-    await adminDb.collection("users").doc(uid).update(updateData);
+    if (photo) {
+        const objectKey = `photo/${Date.now()}-${randomUUID()}.webp`;
+        const buffer = Buffer.from(await photo.arrayBuffer());
+        await uploadFile(buffer, objectKey);
+        updateData.photo = objectKey;
+    }
+    delete updateData.email;
+
+    await adminDb.collection("users").doc(uid)
+        .update({
+            ...updateData,
+            updatedAt: new Date()
+        });
 
     return {
         status: true,

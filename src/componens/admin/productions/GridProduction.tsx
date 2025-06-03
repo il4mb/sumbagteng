@@ -88,7 +88,7 @@ export default function GridProduction({ height = 600 }: IGridProductionProps) {
     const [hasInitialLoad, setHasInitialLoad] = useState(false);
 
     const fetchDesigns = useCallback(() => {
-        if (!user?.uid) {
+        if (!user?.id) {
             setDesigns([]);
             setLoading(false);
             return () => { };
@@ -100,7 +100,7 @@ export default function GridProduction({ height = 600 }: IGridProductionProps) {
         const unsubDesigns = onSnapshot(
             query(
                 collection(db, "productions"),
-                where("executedBy", "==", user.uid),
+                where("executedBy", "==", user.id),
                 orderBy("createdAt", "desc")
             ),
             async (snapshot) => {
@@ -147,7 +147,7 @@ export default function GridProduction({ height = 600 }: IGridProductionProps) {
         );
 
         return unsubDesigns;
-    }, [user?.uid]);
+    }, [user?.id]);
 
     useEffect(() => {
         const unsubscribe = fetchDesigns();

@@ -22,7 +22,7 @@ function ChatInput({ chatId }: IChatInputProps) {
         try {
             const chat = {
                 content: message.trim(),
-                sendBy: user.uid,
+                sendBy: user.id,
                 sendAt: Timestamp.now(),
                 read: false,
             };
