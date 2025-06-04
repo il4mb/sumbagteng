@@ -13,7 +13,7 @@ type SUser = {
     role: "admin" | "client"
 };
 
-export async function AddUser({ name, email, photo, password }: Omit<SUser, "id"> & { password: string; }) {
+export async function AddUser({ name, email, role, photo, password }: Omit<SUser, "id"> & { password: string; }) {
     const session = await getSession();
     if (session?.role !== "admin") {
         return { status: false, message: "Permission denied" };
@@ -24,8 +24,7 @@ export async function AddUser({ name, email, photo, password }: Omit<SUser, "id"
         const userRecord = await adminAuth.createUser({
             email,
             password,
-            displayName: name,
-            photoURL: photo,
+            displayName: name
         });
 
         await adminDb
@@ -36,6 +35,7 @@ export async function AddUser({ name, email, photo, password }: Omit<SUser, "id"
                 email,
                 photo,
                 createdAt: new Date().toISOString(),
+                role
             });
 
         return {
@@ -47,7 +47,7 @@ export async function AddUser({ name, email, photo, password }: Omit<SUser, "id"
         };
     } catch (error: any) {
         return {
-            status: true,
+            status: false,
             message: error.message || "Caught an Error",
         };
     }
@@ -96,12 +96,15 @@ export async function ListUser() {
         const userRef = adminDb.doc(`users/${user.uid}`);
         const userSnap = await userRef.get();
         if (userSnap.exists) {
+            const userData = userSnap.data();
+
             return {
                 id: user.uid,
                 name: user.displayName,
                 photo: user.photoURL,
                 email: user.email,
-                ...userSnap.data()
+                ...userData,
+                updatedAt: userData?.updatedAt?.toDate()?.toISOString()
             }
         }
         return {

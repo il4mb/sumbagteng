@@ -87,18 +87,20 @@ export default function LoginPage() {
                 });
                 const data = (await res.json()) as ApiResponse<{ token: string }>;
                 if (!res.ok || !data.status) throw new Error(data?.message || 'Login failed at server.');
-
+                socket.emit("login", data.data?.token);
                 enqueueSnackbar('Login successful!', { variant: 'success' });
+                router.push('/dashboard');
+
                 // Store token in localStorage if rememberMe is checked
                 if (rememberMe) {
                     localStorage.setItem('authToken', token);
                 } else {
                     sessionStorage.setItem('authToken', token);
                 }
-                
-                router.push('/dashboard');
-                socket.emit("login", data.data?.token);
-                
+                setTimeout(() => {
+                    enqueueSnackbar('Redirecting...', { variant: 'success' });
+                }, 400);
+
             }
         } catch (err: any) {
             setError(getFirebaseError(err.code || err.message));
