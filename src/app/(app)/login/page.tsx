@@ -59,7 +59,7 @@ export default function LoginPage() {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
-                socket.emit("login");
+                // socket.emit("login");
                 router.push('/dashboard');
             }
         });
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 });
                 const data = (await res.json()) as ApiResponse<{ token: string }>;
                 if (!res.ok || !data.status) throw new Error(data?.message || 'Login failed at server.');
-                socket.emit("login", data.data?.token);
+                // socket.emit("login", data.data?.token);
                 enqueueSnackbar('Login successful!', { variant: 'success' });
                 router.push('/dashboard');
 

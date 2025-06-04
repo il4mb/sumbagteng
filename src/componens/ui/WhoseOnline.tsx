@@ -11,45 +11,45 @@ export default function WhoseOnline() {
     const [uids, setUids] = useState<string[]>([]);
     const [users, setUsers] = useState<User[]>([]);
 
-    useEffect(() => {
-        const callbackHandler = (uids: string[]) => setUids(uids);
-        socket.on("online-users", callbackHandler);
-        socket.emit("seek-online-users");
-        return () => {
-            socket.off("online-users", callbackHandler);
-        }
-    }, []);
+    // useEffect(() => {
+    //     const callbackHandler = (uids: string[]) => setUids(uids);
+    //     socket.on("online-users", callbackHandler);
+    //     socket.emit("seek-online-users");
+    //     return () => {
+    //         socket.off("online-users", callbackHandler);
+    //     }
+    // }, []);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        if (uids.length === 0) {
-            setUsers([]);
-            return;
-        }
+    //     if (uids.length === 0) {
+    //         setUsers([]);
+    //         return;
+    //     }
 
-        async function fetchUsers() {
-            try {
-                // Map over uids and fetch user doc for each uid
-                const userPromises = uids.map(async (uid) => {
-                    const docRef = doc(db, 'users', uid);
-                    const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) {
-                        return { id: uid, ...docSnap.data() } as User;
-                    } else {
-                        return null;
-                    }
-                });
+    //     async function fetchUsers() {
+    //         try {
+    //             // Map over uids and fetch user doc for each uid
+    //             const userPromises = uids.map(async (uid) => {
+    //                 const docRef = doc(db, 'users', uid);
+    //                 const docSnap = await getDoc(docRef);
+    //                 if (docSnap.exists()) {
+    //                     return { id: uid, ...docSnap.data() } as User;
+    //                 } else {
+    //                     return null;
+    //                 }
+    //             });
 
-                const usersData = await Promise.all(userPromises);
-                // Filter out any nulls (non-existent users)
-                setUsers(usersData.filter(Boolean) as User[]);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        }
+    //             const usersData = await Promise.all(userPromises);
+    //             // Filter out any nulls (non-existent users)
+    //             setUsers(usersData.filter(Boolean) as User[]);
+    //         } catch (error) {
+    //             console.error('Error fetching user data:', error);
+    //         }
+    //     }
 
-        fetchUsers();
-    }, [uids]);
+    //     fetchUsers();
+    // }, [uids]);
 
 
     const container = {
@@ -66,6 +66,12 @@ export default function WhoseOnline() {
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0 }
     };
+
+    return (
+        <>
+            <Typography>Live server not supported in free tire, please contact developer.</Typography>
+        </>
+    )
 
     return (
         <Stack spacing={2} sx={{ p: 2 }}>

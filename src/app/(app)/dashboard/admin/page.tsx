@@ -3,7 +3,7 @@ import ChatsListDialog from '@/componens/chats/ChatsListDialog';
 import { StyledCardLink } from '@/componens/styled';
 import Header from '@/componens/ui/Header';
 import ProfileAction from '@/componens/ui/ProfileAction';
-import { SupervisedUserCircle } from '@mui/icons-material';
+import { SettingsRounded, SupervisedUserCircle } from '@mui/icons-material';
 import { Avatar, Box, Container, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import Link from 'next/link';
 
@@ -18,6 +18,11 @@ export default function App() {
                 actions={
                     <Stack direction="row" spacing={4} alignItems="center">
                         <Stack direction="row" spacing={1} alignItems="center">
+                            <Tooltip title="Settings">
+                                <IconButton LinkComponent={Link} href='/dashboard/admin/settings'>
+                                    <SettingsRounded />
+                                </IconButton>
+                            </Tooltip>
                             <Tooltip title="Users Manager">
                                 <IconButton LinkComponent={Link} href='/dashboard/admin/users'>
                                     <SupervisedUserCircle />
