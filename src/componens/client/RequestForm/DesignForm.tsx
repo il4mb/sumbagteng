@@ -1,12 +1,14 @@
 "use client"
 
-import { Stack, TextField, Box, Grid, Chip, IconButton, Tooltip } from "@mui/material";
+import { Stack, TextField, Box, Grid, Chip, IconButton, Tooltip, MenuItem } from "@mui/material";
 import { motion } from "framer-motion";
-import { useState, useRef, Dispatch, SetStateAction } from "react";
+import { useState, useRef, Dispatch, SetStateAction, useEffect } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import { UploadFile } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
+import { collection, getDocs, limit, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "@/firebase/config";
 
 const validateImageUrl = (url: string): boolean => {
     try {
@@ -32,11 +34,13 @@ const validateImageUrl = (url: string): boolean => {
 
 export type DesignFormData = {
     name: string;
+    type: string;
     size: string;
     theme: string;
     images: ImageSource[];
     description: string;
 }
+
 export interface IProductionFormProps {
     data: DesignFormData;
     onUpdate: Dispatch<SetStateAction<DesignFormData>>;
@@ -48,12 +52,47 @@ type ImageSource = {
     file?: File;
 };
 
+type TSize = {
+    name: string;
+    value: string;
+}
+
 export default function DesignForm({ data, onUpdate }: IProductionFormProps) {
     const { enqueueSnackbar } = useSnackbar();
-    const { name, size, theme, images, description } = data;
-
+    const { name, size, theme, images, description, type } = data;
     const [newImageUrl, setNewImageUrl] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [designTypes, setDesignTypes] = useState<string[]>([]);
+    const [designSizes, setDesignSizes] = useState<TSize[]>([]);
+
+    useEffect(() => {
+        const typesRef = collection(db, "design-types");
+        const unSub = onSnapshot(typesRef, (snapshot) => {
+            const wewDesignTypes = snapshot.docs.map(doc => doc.data().name);
+            setDesignTypes(wewDesignTypes);
+        })
+        return () => {
+            unSub();
+        }
+    }, []);
+
+    useEffect(() => {
+        console.log("TYPE", type);
+        if (!type) return;
+        const typesRef = collection(db, "design-types");
+        const typeQuery = query(typesRef, where('name', '==', type), limit(1));
+
+        const unSub = onSnapshot(typeQuery, async (snapshot) => {
+            const typeId = snapshot.docs[0].id;
+            const sizesRef = collection(db, "design-types", typeId, "sizes");
+            const sizeSnapshoot = await getDocs(sizesRef);
+            const sizes = sizeSnapshoot.docs.map((doc) => ({ ...doc.data() } as TSize));
+            setDesignSizes(sizes);
+        });
+        return () => {
+            unSub();
+        }
+    }, [type]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -197,19 +236,42 @@ export default function DesignForm({ data, onUpdate }: IProductionFormProps) {
                         </motion.div>
                     </Grid>
                     <Grid size={6}>
-                        {/* Location */}
                         <motion.div whileHover={{ scale: 1.01 }}>
                             <TextField
+                                select
+                                label="Type"
+                                name="type"
+                                value={type}
+                                onChange={handleInputChange}
+                                fullWidth
+                                required>
+                                {designTypes.map((type) => (
+                                    <MenuItem key={type} value={type}>
+                                        {type}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </motion.div>
+                    </Grid>
+                    <Grid size={6}>
+                        <motion.div whileHover={{ scale: 1.01 }}>
+                            <TextField
+                                select
+                                name="size"
                                 label="Size"
                                 value={size}
                                 onChange={handleInputChange}
                                 fullWidth
-                                required
-                            />
+                                required>
+                                {designSizes.map((size, i) => (
+                                    <MenuItem key={i} value={size.value}>
+                                        {size.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
                         </motion.div>
                     </Grid>
                     <Grid size={6}>
-                        {/* Cluster */}
                         <motion.div whileHover={{ scale: 1.01 }}>
                             <TextField
                                 label="Theme"

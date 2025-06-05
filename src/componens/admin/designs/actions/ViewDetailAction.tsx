@@ -2,7 +2,7 @@
 
 import { db } from "@/firebase/config";
 import { DesignRequest, RequestStatus, User } from "@/types";
-import { AspectRatio, CalendarToday, Close, Description, ImageRounded, OpenInBrowserRounded, Style, Update } from "@mui/icons-material";
+import { AspectRatio, Ballot, CalendarToday, Close, Description, ImageRounded, OpenInBrowserRounded, Style, Update } from "@mui/icons-material";
 import {
     Dialog,
     DialogTitle,
@@ -194,6 +194,14 @@ const DetailDesignDialog = ({ id, open, onClose }: Props) => {
                                         <Update color="action" />
                                         <Typography>
                                             <strong>Last Updated:</strong> {formatDate(design.updatedAt)}
+                                        </Typography>
+                                    </Stack>
+                                </Grid>
+                                <Grid size={6} sx={{ py: 1 }}>
+                                    <Stack direction="row" spacing={2} alignItems="center">
+                                        <Ballot color="action" />
+                                        <Typography>
+                                            <strong>Type:</strong> {design.type}
                                         </Typography>
                                     </Stack>
                                 </Grid>

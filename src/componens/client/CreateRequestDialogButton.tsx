@@ -50,7 +50,7 @@ const DesignRequestButton = ({ onCloseParent }: { onCloseParent: () => void }) =
 	const { user } = useAuth();
 	const { enqueueSnackbar } = useSnackbar();
 	const [open, setOpen] = useState(false);
-	const [data, setData] = useState<DesignFormData>({ name: '', size: 'A4', theme: '', images: [], description: '' });
+	const [data, setData] = useState<DesignFormData>({ name: '', size: '', type: '', theme: '', images: [], description: '' });
 	const [loading, setLoading] = useState(false);
 
 	const handleOpen = () => setOpen(true);

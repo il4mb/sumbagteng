@@ -87,7 +87,7 @@ export const AddRequest = async (props: AddRequestProps) => {
 
         if (props.type === "design") {
 
-            const { name, size, images, description, theme } = props.data;
+            const { name, size, images, description, theme, type: designType } = props.data;
             const imageFiles = images.filter(e => e.type == "upload");
             const imageUploadPromises = imageFiles.map(async f => {
                 const file = f.file;
@@ -101,7 +101,7 @@ export const AddRequest = async (props: AddRequestProps) => {
             const uploadedUrls = (await Promise.all(imageUploadPromises)).filter(e => typeof e == "string");
             const imagesUrls: string[] = [...uploadedUrls, ...(imageFiles.filter(e => e.type == 'url').map(e => e.value))].filter(Boolean);
 
-            const design: Omit<DesignRequest, "id" | "type"> = {
+            const design: Omit<DesignRequest, "id"> = {
                 images: imagesUrls,
                 createdBy: user.uid,
                 createdAt: new Date(),
@@ -109,6 +109,7 @@ export const AddRequest = async (props: AddRequestProps) => {
                 name,
                 size,
                 theme,
+                type: designType as any,
                 description
             }
 
@@ -119,8 +120,6 @@ export const AddRequest = async (props: AddRequestProps) => {
                 status: true,
                 message: "Action success"
             }
-
-
 
         } else if (props.type === "production") {
             const { location, cluster, allocation, quantity, designRef, description } = props.data;

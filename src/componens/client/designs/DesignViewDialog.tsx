@@ -1,5 +1,5 @@
 "use client"
-import { AspectRatio, CalendarToday, Description, ImageRounded, OpenInBrowserRounded, Style, Update } from '@mui/icons-material';
+import { AspectRatio, Ballot, CalendarToday, Description, ImageRounded, OpenInBrowserRounded, Style, Update } from '@mui/icons-material';
 import {
     Dialog,
     DialogContent,
@@ -66,7 +66,7 @@ type DialogProps = Props & {
 }
 
 const DialogDetailDesign = ({ row, open, onClose }: DialogProps) => {
-    
+
     const [expand, setExpand] = useState(false);
     const [executor, setExecutor] = useState<User | null | undefined>(undefined);
     const [design, setDesign] = useState<DesignRequest | undefined | null>();
@@ -152,7 +152,7 @@ const DialogDetailDesign = ({ row, open, onClose }: DialogProps) => {
                         </Stack>
 
                         <Collapse in={expand}>
-                            <Grid container>
+                            <Grid container sx={{ mb: 1 }}>
                                 <Grid size={6} sx={{ py: 1 }}>
                                     <Stack direction="row" spacing={2} alignItems="center">
                                         <Style color="action" />
@@ -186,6 +186,14 @@ const DialogDetailDesign = ({ row, open, onClose }: DialogProps) => {
                                         </Typography>
                                     </Stack>
                                 </Grid>
+                                <Grid size={6} sx={{ py: 1 }}>
+                                    <Stack direction="row" spacing={2} alignItems="center">
+                                        <Ballot color="action" />
+                                        <Typography>
+                                            <strong>Type:</strong> {design?.type}
+                                        </Typography>
+                                    </Stack>
+                                </Grid>
                             </Grid>
                             <Stack direction="row" spacing={2} alignItems="flex-start">
                                 <Description color="action" sx={{ mt: 1 }} />
@@ -202,7 +210,7 @@ const DialogDetailDesign = ({ row, open, onClose }: DialogProps) => {
                                     </Typography>
                                 </Stack>
                             </Stack>
-                            <Box>
+                            <Box sx={{ mt: 2 }}>
                                 <Typography fontWeight={700} gutterBottom>Design Reference:</Typography>
                                 <AnimatePresence>
                                     <Stack direction={'row'} spacing={2} sx={{ overflow: 'auto' }}>
