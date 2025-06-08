@@ -57,6 +57,11 @@ type TSize = {
     value: string;
 }
 
+type Theme = {
+    id: string;
+    name: string;
+}
+
 export default function DesignForm({ data, onUpdate }: IProductionFormProps) {
     const { enqueueSnackbar } = useSnackbar();
     const { name, size, theme, images, description, type } = data;
@@ -64,20 +69,28 @@ export default function DesignForm({ data, onUpdate }: IProductionFormProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [designTypes, setDesignTypes] = useState<string[]>([]);
     const [designSizes, setDesignSizes] = useState<TSize[]>([]);
+    const [themes, setThemes] = useState<Theme[]>([]);
 
     useEffect(() => {
         const typesRef = collection(db, "design-types");
-        const unSub = onSnapshot(typesRef, (snapshot) => {
+        const unsubTypes = onSnapshot(typesRef, (snapshot) => {
             const wewDesignTypes = snapshot.docs.map(doc => doc.data().name);
             setDesignTypes(wewDesignTypes);
         })
+
+        const themeRef = collection(db, "themes");
+        const unsubThemes = onSnapshot(themeRef, (snapshot) => {
+            const newThemes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Theme));
+            setThemes(newThemes);
+        })
+
         return () => {
-            unSub();
+            unsubTypes();
+            unsubThemes();
         }
     }, []);
 
     useEffect(() => {
-        console.log("TYPE", type);
         if (!type) return;
         const typesRef = collection(db, "design-types");
         const typeQuery = query(typesRef, where('name', '==', type), limit(1));
@@ -274,12 +287,19 @@ export default function DesignForm({ data, onUpdate }: IProductionFormProps) {
                     <Grid size={6}>
                         <motion.div whileHover={{ scale: 1.01 }}>
                             <TextField
+                                select
                                 label="Theme"
                                 name="theme"
                                 value={theme}
                                 onChange={handleInputChange}
                                 fullWidth
-                                required />
+                                required >
+                                {themes.map((theme, i) => (
+                                    <MenuItem key={i} value={theme.name}>
+                                        {theme.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
                         </motion.div>
                     </Grid>
                     <Grid size={12}>

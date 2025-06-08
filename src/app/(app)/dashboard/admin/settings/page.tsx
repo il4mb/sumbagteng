@@ -2,6 +2,7 @@
 
 import BranchManager from "@/componens/admin/settings/BranchManager";
 import DesignTypeManager from "@/componens/admin/settings/DesignTypeManager";
+import ThemeManager from "@/componens/admin/settings/ThemeManager";
 import Header from "@/componens/ui/Header";
 import { Box, Container } from "@mui/material";
 
@@ -19,6 +20,10 @@ export default async function PageUsers() {
 
             <Box sx={{ mt: 4 }}>
                 <DesignTypeManager />
+            </Box>
+            
+            <Box sx={{ mt: 4 }}>
+                <ThemeManager />
             </Box>
 
 
