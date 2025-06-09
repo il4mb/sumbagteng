@@ -132,7 +132,7 @@ export default function SelectDesignDialog({ onSelect }: ISelectDesignDialogProp
                                                     {design.name || 'Untitled Design'}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    Created: {design.completion.completedAt.toLocaleDateString()}
+                                                    Created: {design.completion.completedAt?.toLocaleDateString()}
                                                 </Typography>
                                             </CardContent>
                                         </Card>

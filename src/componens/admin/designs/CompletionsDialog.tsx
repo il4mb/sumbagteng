@@ -97,7 +97,7 @@ export default function CompletionsDialog({ designId, text }: ICompletionsDialog
                                             )}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            {c.completedAt.toLocaleDateString("id-ID", {
+                                            {c?.completedAt?.toLocaleDateString("id-ID", {
                                                 day: '2-digit',
                                                 month: 'short',
                                                 year: 'numeric',
