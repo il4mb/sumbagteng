@@ -40,7 +40,7 @@ export default function UserAvatar(props: IUserAvatarProps) {
             {user ? (
                 <Tooltip title={user.name} arrow>
                     <Avatar
-                        src={user.photo || undefined}
+                        src={user.photo ? "/storage/" + user.photo : undefined}
                         alt={user.name || "User Avatar"}
                         sx={{
                             width: size === "small" ? 30 : size === "medium" ? 38 : 48,

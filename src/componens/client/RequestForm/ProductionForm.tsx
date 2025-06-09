@@ -1,13 +1,12 @@
 "use client"
 
-import { db } from "@/firebase/config";
-import { TouchAppRounded, UploadFile } from "@mui/icons-material";
 import { Stack, TextField, MenuItem, Box, Grid, InputAdornment } from "@mui/material";
-import { collection, onSnapshot } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import SelectDesignDialog from "./SelectDesignDialog";
 import ImagePickerButton from "@/componens/ui/ImagePickerButton";
+import { useAllocations, useBranches, useClusters, useDesignTypes } from "@/componens/ctx/hooks";
+import { DesignSize, DesignType } from "@/types";
 
 export interface IProductionFormProps {
     data: ProductionFormData;
@@ -23,43 +22,39 @@ type UploadRef = {
     value: File;
 }
 export type ProductionFormData = {
-    location: string;
+    branch: string;
     cluster: string;
     allocation: string;
     quantity: number;
     designRef: DesignRef | UploadRef;
+    designType: DesignType['id'];
+    designSize: DesignSize['value'];
     description: string;
 };
 
 
 export default function ProductionForm({ data, onUpdate }: IProductionFormProps) {
-    const { location, cluster, allocation, quantity, designRef, description } = data;
+    const [branchId, setBranchId] = useState('');
+    const [designTypeId, setDesignTypeId] = useState('');
+
+    const { branch, cluster, allocation, quantity, designRef, designType, designSize, description } = data;
     const [errors, setErrors] = useState<Partial<Omit<ProductionFormData, "quantity"> & { quantity: string }>>({});
-    const [locations, setLocations] = useState<{ label: string, value: string; }[]>([]);
-    const [clusters, setClusters] = useState<{ label: string, value: string; }[]>([]);
-    const [allocations, setAllocations] = useState<{ label: string, value: string; }[]>([]);
+    const branches = useBranches();
+    const clusters = useClusters({ branchId });
+    const allocations = useAllocations();
+    const { types, sizes } = useDesignTypes({ id: designTypeId });
 
     useEffect(() => {
-        const c = collection(db, 'locations');
-        onSnapshot(c, (snapshot) => {
-            const clusterData = snapshot.docs.map(doc => ({ value: doc.id, label: doc.data().name }));
-            setLocations(clusterData);
-        });
-        const a = collection(db, 'allocations');
-        onSnapshot(a, (snapshot) => {
-            const allocationData = snapshot.docs.map(doc => ({ value: doc.id, ...doc.data() } as { label: string, value: string; }));
-            setAllocations(allocationData);
-        });
-    }, []);
+        const find = branches.find(b => b.id == branchId);
+        onUpdate(prev => ({ ...prev, branch: find?.name || '' }));
+    }, [branchId]);
+
 
     useEffect(() => {
-        if (!location) return;
-        const c = collection(db, 'locations', location, 'clusters');
-        onSnapshot(c, (snapshot) => {
-            const clusterData = snapshot.docs.map(doc => ({ value: doc.id, label: doc.data().name }));
-            setClusters(clusterData);
-        });
-    }, [location]);
+        const find = types.find(b => b.id == designTypeId);
+        onUpdate(prev => ({ ...prev, designType: find?.name || '' }));
+    }, [designTypeId]);
+
 
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,17 +81,17 @@ export default function ProductionForm({ data, onUpdate }: IProductionFormProps)
                         <Grid size={6}>
                             <TextField
                                 select
-                                label="Location"
-                                name="location"
-                                value={location}
-                                onChange={handleInputChange}
-                                error={!!errors.location}
-                                helperText={errors.location}
+                                label="Branch"
+                                name="branch"
+                                value={branchId}
+                                onChange={(e) => setBranchId(e.target.value)}
+                                error={!!errors.branch}
+                                helperText={errors.branch}
                                 fullWidth
                                 required>
-                                {locations.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
+                                {branches.map((branch) => (
+                                    <MenuItem key={branch.id} value={branch.id}>
+                                        {branch.name}
                                     </MenuItem>
                                 ))}
                             </TextField>
@@ -107,16 +102,16 @@ export default function ProductionForm({ data, onUpdate }: IProductionFormProps)
                                 select
                                 label="Cluster"
                                 name="cluster"
-                                disabled={!location}
+                                disabled={!branch}
                                 value={cluster}
                                 onChange={handleInputChange}
                                 error={!!errors.cluster}
-                                helperText={!location ? "please select location first!" : errors.cluster}
+                                helperText={!branch ? "please select branch first!" : errors.cluster}
                                 fullWidth
                                 required>
                                 {clusters.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
+                                    <MenuItem key={option.name} value={option.name}>
+                                        {option.name}
                                     </MenuItem>
                                 ))}
                             </TextField>
@@ -159,7 +154,9 @@ export default function ProductionForm({ data, onUpdate }: IProductionFormProps)
                             <TextField
                                 label="Design Reference"
                                 name="designRef"
-                                value={`${designRef?.type == "design" ? `DESIGN: ${designRef?.value}` : designRef?.type == 'upload' ? `UPLOAD: ${designRef?.value.name}` : "NONE"}`}
+                                value={`${designRef?.type == "design"
+                                    ? `DESIGN: ${designRef?.value}` : designRef?.type == 'upload'
+                                        ? `UPLOAD: ${designRef?.value.name}` : "NONE"}`}
                                 fullWidth
                                 required
                                 placeholder="Enter design ID or reference number"
@@ -194,6 +191,47 @@ export default function ProductionForm({ data, onUpdate }: IProductionFormProps)
                                 }}
                             />
                         </Grid>
+
+                        <Grid size={6}>
+                            <TextField
+                                select
+                                label="Design Type"
+                                name="designType"
+                                value={designTypeId}
+                                onChange={(e) => setDesignTypeId(e.target.value)}
+                                error={!!errors.designType}
+                                helperText={errors.designType}
+                                fullWidth
+                                required>
+                                {types.map((type) => (
+                                    <MenuItem key={type.id} value={type.id}>
+                                        {type.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+
+                        <Grid size={6}>
+                            <TextField
+                                select
+                                label="Design Size"
+                                name="designSize"
+                                value={designSize}
+                                onChange={handleInputChange}
+                                disabled={!designType}
+                                error={!!errors.designSize}
+                                helperText={errors.designSize}
+                                fullWidth
+                                required>
+                                {sizes.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+
+
                         <Grid size={12}>
                             <TextField
                                 label="Description"

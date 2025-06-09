@@ -5,8 +5,6 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, List, MenuIt
 import { useEffect, useState } from 'react';
 import ProductionForm, { ProductionFormData } from './RequestForm/ProductionForm';
 import DesignForm, { DesignFormData } from './RequestForm/DesignForm';
-import { addDoc, collection } from 'firebase/firestore';
-import { db } from '@/firebase/config';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '../AuthProvider';
 import { AddRequest } from '@/action/request';
@@ -46,11 +44,19 @@ export default function CreateRequestDialogButton() {
 	);
 }
 
+const designDummyData: DesignFormData = {
+	name: '',
+	size: '',
+	type: '',
+	theme: '',
+	images: [],
+	description: ''
+}
 const DesignRequestButton = ({ onCloseParent }: { onCloseParent: () => void }) => {
 	const { user } = useAuth();
 	const { enqueueSnackbar } = useSnackbar();
 	const [open, setOpen] = useState(false);
-	const [data, setData] = useState<DesignFormData>({ name: '', size: '', type: '', theme: '', images: [], description: '' });
+	const [data, setData] = useState<DesignFormData>(designDummyData);
 	const [loading, setLoading] = useState(false);
 
 	const handleOpen = () => setOpen(true);
@@ -60,10 +66,7 @@ const DesignRequestButton = ({ onCloseParent }: { onCloseParent: () => void }) =
 		if (loading || !user?.id) return;
 		setLoading(true);
 		try {
-			const response = await AddRequest({
-				type: 'design',
-				data
-			});
+			const response = await AddRequest({ type: 'design', data });
 			if (!response?.status) {
 				throw new Error(response?.message || "Caught an Error");
 			}
@@ -127,12 +130,22 @@ const DesignRequestButton = ({ onCloseParent }: { onCloseParent: () => void }) =
 	);
 };
 
+const productionDummyData: ProductionFormData = {
+	branch: '',
+	cluster: '',
+	allocation: '',
+	quantity: 1,
+	designRef: { type: 'design', value: '' },
+	designType: '',
+	designSize: '',
+	description: ''
+}
 const ProductionRequestButton = ({ onCloseParent }: { onCloseParent: () => void }) => {
 
 	const { user } = useAuth();
 	const { enqueueSnackbar } = useSnackbar();
 	const [open, setOpen] = useState(false);
-	const [data, setData] = useState<ProductionFormData>({ location: '', cluster: '', allocation: '', quantity: 1, designRef: { type: 'design', value: '' }, description: '' });
+	const [data, setData] = useState<ProductionFormData>(productionDummyData);
 	const [loading, setLoading] = useState(false);
 
 	const handleOpen = () => setOpen(true);

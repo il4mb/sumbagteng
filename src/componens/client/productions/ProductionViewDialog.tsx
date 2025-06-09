@@ -79,7 +79,7 @@ const DialogDetailProduction = ({ row, open, onClose }: DialogProps) => {
         const unsub = onSnapshot(docRef, async (snapshoot) => {
             const data = snapshoot.data() as Omit<ProductionRequest, "createdAt" | "updatedAt"> & { createdAt: Timestamp; updatedAt?: Timestamp };
 
-            const locationRef = doc(db, "locations", data.location);
+            const locationRef = doc(db, "locations", data.branch);
             const locationSnap = await getDoc(locationRef);
             setLocation({ ...locationSnap.data(), id: locationSnap.id } as Location);
 
@@ -164,7 +164,7 @@ const DialogDetailProduction = ({ row, open, onClose }: DialogProps) => {
                         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
                             <Box>
                                 <Typography fontSize={22} fontWeight={700}>
-                                    {production?.title || "Untitled #" + production?.id}
+                                    {"#" + production?.id}
                                     <Chip label={production?.status} color={getColor(production?.status)} sx={{ textTransform: "capitalize", ml: 2 }} />
                                 </Typography>
                                 <Typography color='text.secondary'>

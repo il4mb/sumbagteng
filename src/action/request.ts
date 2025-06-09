@@ -122,9 +122,10 @@ export const AddRequest = async (props: AddRequestProps) => {
             }
 
         } else if (props.type === "production") {
-            const { location, cluster, allocation, quantity, designRef, description } = props.data;
 
-            const request = { location, cluster, allocation, quantity, description, design: {} }
+            const { branch, cluster, allocation, quantity, designRef, designSize, designType, description } = props.data;
+            const request = { branch, cluster, allocation, quantity, designSize, designType, description, design: {} }
+
             if (designRef.type == "upload") {
                 const objectKey = `production/${Date.now()}-${randomUUID()}.webp`;
                 const buffer = Buffer.from(await designRef.value.arrayBuffer());

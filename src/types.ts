@@ -1,3 +1,30 @@
+// PRIMITIVE TYPE
+
+export type Branch = {
+	id: string;
+	address: string;
+	city: string;
+	name: string;
+}
+
+export type Cluster = Branch;
+
+export type Allocation = {
+	value: string;
+	label: string;
+}
+
+export type DesignType = {
+	id: string;
+	name: string;
+}
+export type DesignSize = {
+	name: string;
+	value: string;
+}
+
+
+
 export type ApiResponse<T = unknown> = {
 	status: boolean;
 	message: string;
@@ -24,6 +51,15 @@ export type User = {
 	role: "admin" | "client";
 	photo?: string;
 }
+
+
+
+
+
+
+
+
+
 
 // Enum-style literal union for better clarity
 export type RequestStatus =
@@ -57,7 +93,7 @@ export interface DesignRequest extends RequestBase {
 export interface ProductionRequest extends RequestBase {
 	type: "production";
 	title: string;
-	location: string;
+	branch: string;
 	cluster: string;
 	allocation: string;
 	quantity: number;
@@ -65,6 +101,8 @@ export interface ProductionRequest extends RequestBase {
 		type: 'design' | 'upload';
 		value: string;
 	};
+	designType: string;
+	designSize: string;
 }
 
 // Unified request union for processing or filtering
@@ -75,7 +113,7 @@ export type Completion = {
 	id: string;
 	image: string;
 	message: string;
-	completedAt: Date;
+	completedAt?: Date;
 	updatedAt?: Date;
 	status: "pending" | "rejected" | "accepted";
 	rejectMessage?: string;

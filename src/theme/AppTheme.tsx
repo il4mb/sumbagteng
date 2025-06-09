@@ -22,22 +22,21 @@ interface AppThemeProps {
 export default function AppTheme(props: AppThemeProps) {
 
     const { children, disableCustomTheme, themeComponents } = props;
-    const { mode, systemMode, setMode } = useColorScheme();
-
-    useEffect(() => {
-        setMode("dark")
-    }, [])
 
     const theme = React.useMemo(() => {
         return disableCustomTheme
             ? {}
             : createTheme({
+
                 // For more details about CSS variables configuration, see https://mui.com/material-ui/customization/css-theme-variables/configuration/
                 cssVariables: {
                     colorSchemeSelector: 'data-mui-color-scheme',
                     cssVarPrefix: 'template',
                 },
                 colorSchemes, // Recently added in v6 for building light & dark mode app, see https://mui.com/material-ui/customization/palette/#color-schemes
+                palette: {
+                    ...colorSchemes.dark.palette
+                },
                 typography,
                 shadows,
                 shape,
